@@ -31,6 +31,7 @@
                 <div id="active-profile-info" class="hidden mb-2">
                     <div id="total-xp-display" class="xp-pill">Total XP : 0</div>
                     <div id="streak-info" class="streak-info"></div>
+                    <div id="season-card" class="season-card"></div>
                 </div>
 
                 <div id="reminder-banner" class="reminder-banner hidden">
@@ -46,7 +47,7 @@
                     <button id="resume-btn" class="btn btn-secondary hidden">▶ REPRENDRE MA MISSION</button>
                     <button id="daily-btn" class="btn btn-primary hidden">⭐ MISSION DU JOUR</button>
                     <button id="subjects-btn" class="btn btn-secondary hidden">📚 CHOISIR UNE MATIÈRE</button>
-                    <button id="badges-btn" class="btn btn-secondary hidden">🏅 MES BADGES</button>
+                    <button id="badges-btn" class="btn btn-secondary hidden">🃏 MA COLLECTION</button>
                     <button id="errors-btn" class="btn btn-secondary hidden">🔁 MES ERREURS</button>
                     <button id="switch-profile-btn" class="btn btn-secondary hidden">CHANGER DE PROFIL</button>
                 </div>
@@ -72,7 +73,7 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v12</div>
+                <div class="version">v13</div>
             </div>
         </div>
 
@@ -86,10 +87,11 @@
             </div>
         </div>
 
-        <!-- Badges -->
+        <!-- Collection : cartes, records, matchs -->
         <div id="badges-screen" class="screen hidden">
-            <h1>Mes badges</h1>
+            <h1>Ma collection</h1>
             <p id="badges-total"></p>
+            <div id="collection-summary" class="collection-summary"></div>
             <div id="badges-list" class="badges-list"></div>
             <button id="badges-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
         </div>
@@ -101,6 +103,10 @@
                 <span id="score-display">Score: 0</span>
                 <span id="level-title">Mission</span>
                 <span id="timer-display">Temps: 00s</span>
+            </div>
+
+            <div id="match-board" class="match-board hidden" aria-live="polite">
+                <span>⚽ Toi</span> <b id="goals-for">0</b> <span>–</span> <b id="goals-against">0</b> <span id="opponent-name"></span>
             </div>
 
             <div id="streak-badge" class="streak-badge" aria-live="polite">COMBO x2 🔥</div>
@@ -127,6 +133,7 @@
         <div id="end-screen" class="screen hidden">
             <div class="animate-pop">
                 <h1 id="end-title">Félicitations !</h1>
+                <div id="end-match" class="end-match hidden"></div>
                 <p id="end-message">Tu as terminé ta mission avec brio.</p>
                 <div class="question-card">
                     <div class="final-score" id="final-score">0</div>

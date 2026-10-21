@@ -158,6 +158,7 @@ export function recordAnswer(profile, q, correct, ms) {
         const stat = (profile.skillStats[id] = profile.skillStats[id] || { ok: 0, total: 0, last: [] });
         stat.total++;
         if (correct) stat.ok++;
+        if (correct && ms) stat.ms = stat.ms ? Math.round(stat.ms * 0.8 + ms * 0.2) : ms; // vitesse moyenne (pour la carte)
         stat.last.push(correct ? 1 : 0);
         if (stat.last.length > 20) stat.last.shift();
         const tier = tierFor(stat);

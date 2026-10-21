@@ -6,6 +6,16 @@ const SESSION_KEY = 'sq_session_';
 
 export const today = () => dateStr(new Date());
 const dateStr = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+// Identifiant de la semaine ISO (du lundi au dimanche), ex : 2026-S43
+export function weekId(d = new Date()) {
+    const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const day = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - day);
+    const y = t.getUTCFullYear();
+    const w = Math.ceil(((t - new Date(Date.UTC(y, 0, 1))) / 86400000 + 1) / 7);
+    return `${y}-S${String(w).padStart(2, '0')}`;
+}
+
 export function addDays(str, n) {
     const [y, m, d] = str.split('-').map(Number);
     return dateStr(new Date(y, m - 1, d + n));
@@ -23,6 +33,11 @@ export function ensureProfile(p) {
     p.facets = p.facets || {};
     p.skillStats = p.skillStats || {};
     p.badges = p.badges || {};
+    p.matches = p.matches || [];
+    p.matchStats = p.matchStats || { w: 0, d: 0, l: 0 };
+    p.records = { bestScore: 0, bestStreak: 0, bestDiff: 0, bestDayStreak: 0, ...(p.records || {}) };
+    p.season = p.season || null;
+    p.seasons = p.seasons || [];
     p.daily = p.daily || { streak: 0, last: null };
     p.schemaVersion = 2;
     return p;

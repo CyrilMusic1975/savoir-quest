@@ -4,6 +4,7 @@ import { buildSession, recordAnswer, completeSession, countToReview, countDue, c
 import { renderQuestion } from './render.js';
 import * as Sync from './sync.js';
 import * as Push from './push.js';
+import * as P from './progress.js';
 
 const $ = id => document.getElementById(id);
 const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), game: $('game-screen'), end: $('end-screen') };
@@ -131,6 +132,8 @@ function updateHome() {
     $('total-xp-display').textContent = `${p.name} : ${p.totalXP || 0} XP`;
     if (typeof updateReminderUI === 'function') updateReminderUI();
     if (Push.isEnabled()) Push.register(p.name);
+    P.ensureSeason(p);
+    renderSeason(p);
     const streak = currentStreak(p);
     $('streak-info').textContent = streak > 0
         ? `🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite${doneToday(p) ? ' — mission du jour faite ✅' : ''}`
@@ -145,6 +148,32 @@ function updateHome() {
     $('errors-btn').textContent = `🔁 MES ERREURS (${review})`;
     const due = countDue(p);
     $('daily-btn').textContent = doneToday(p) ? '⭐ ENCORE UNE MISSION' : (due > 0 ? `⭐ MISSION DU JOUR (${due} à réviser)` : '⭐ MISSION DU JOUR');
+}
+
+// ---------- Saison ----------
+function renderSeason(p) {
+    const card = $('season-card');
+    card.replaceChildren();
+    const pr = P.leagueProgress(p.season.xp);
+    const title = document.createElement('div');
+    title.className = 'season-title';
+    title.textContent = `🏟️ Saison ${p.season.week} · ${pr.league.emoji} ${pr.league.name}`;
+    const bar = document.createElement('div');
+    bar.className = 'badge-bar';
+    const fill = document.createElement('i');
+    fill.style.width = `${pr.pct}%`;
+    bar.appendChild(fill);
+    const sub = document.createElement('div');
+    sub.className = 'badge-sub';
+    sub.textContent = pr.next ? `${p.season.xp} XP cette semaine · encore ${pr.need} XP pour ${pr.next.emoji} ${pr.next.name}` : `${p.season.xp} XP cette semaine · niveau maximum atteint 🏆`;
+    card.append(title, bar, sub);
+    if (p.pendingSeasonReview) {
+        const r = p.pendingSeasonReview;
+        p.pendingSeasonReview = null;
+        S.saveProfiles();
+        const lg = P.LEAGUES.find(l => l.name === r.league);
+        showOverlay({ title: `FIN DE SAISON ${r.week}`, emoji: lg.emoji, headline: `Tu finis en ${lg.name} !`, text: `${r.xp} XP gagnés la semaine dernière. Une nouvelle saison commence : fais encore mieux !`, button: 'C\'EST PARTI !' });
+    }
 }
 
 // ---------- Choix de la matière ----------
@@ -176,49 +205,61 @@ function renderSubjects() {
     });
 }
 
-// ---------- Badges ----------
-$('badges-btn').addEventListener('click', () => { renderBadges(); show('badges'); });
+// ---------- Collection : cartes, records, matchs ----------
+$('badges-btn').addEventListener('click', () => { renderCollection(); show('badges'); });
 $('badges-back-btn').addEventListener('click', () => show('home'));
-function renderBadges() {
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+
+function renderCollection() {
     const p = S.currentProfile();
+    P.ensureSeason(p);
+    // résumé : matchs, records, saisons
+    const sum = $('collection-summary');
+    sum.replaceChildren();
+    const ms = p.matchStats;
+    const lines = [
+        ['⚽ Matchs', `${ms.w} victoire${ms.w > 1 ? 's' : ''} · ${ms.d} nul${ms.d > 1 ? 's' : ''} · ${ms.l} défaite${ms.l > 1 ? 's' : ''}`],
+        ['🏆 Meilleur score', p.records.bestScore ? `${p.records.bestScore} points` : '—'],
+        ['🔥 Meilleure série', p.records.bestStreak ? `${p.records.bestStreak} bonnes réponses d'affilée` : '—'],
+        ['📅 Série de jours', p.records.bestDayStreak ? `${p.records.bestDayStreak} jour${p.records.bestDayStreak > 1 ? 's' : ''}` : '—']
+    ];
+    lines.forEach(([k, v]) => { const row = el('div', 'sum-row'); row.append(el('span', 'sum-k', k), el('span', 'sum-v', v)); sum.appendChild(row); });
+    if (p.seasons.length) {
+        const best = [...p.seasons].sort((a, b) => b.xp - a.xp)[0];
+        const row = el('div', 'sum-row');
+        row.append(el('span', 'sum-k', '🏟️ Meilleure saison'), el('span', 'sum-v', `${best.league} (${best.xp} XP, ${best.week})`));
+        sum.appendChild(row);
+    }
+    // cartes
     const root = $('badges-list');
     root.replaceChildren();
     let total = 0;
     SUBJECTS.forEach(sub => {
-        const h = document.createElement('h2');
-        h.className = 'badge-subject';
-        h.textContent = `${sub.emoji} ${sub.label}`;
-        root.appendChild(h);
-        SKILLS.filter(s => s.subject === sub.id).forEach(skill => {
+        root.appendChild(el('h2', 'badge-subject', `${sub.emoji} ${sub.label}`));
+        const grid = el('div', 'cards-grid');
+        SKILLS.filter(s => s.subject === sub.id).sort((a, b) => (p.badges[b.id] || 0) - (p.badges[a.id] || 0)).forEach(skill => {
+            const c = P.playerCard(p, skill.id);
             const pr = badgeProgress(p, skill.id);
-            if (pr.tier) total++;
-            const row = document.createElement('div');
-            row.className = 'badge-row';
-            const icon = document.createElement('span');
-            icon.className = 'badge-icon';
-            icon.textContent = pr.tier ? TIERS[pr.tier - 1].emoji : '🔒';
-            const info = document.createElement('div');
-            info.className = 'badge-info';
-            const name = document.createElement('div');
-            name.className = 'badge-name';
-            name.textContent = skill.label;
-            const sub2 = document.createElement('div');
-            sub2.className = 'badge-sub';
-            sub2.textContent = pr.next ? `${pr.ok} / ${pr.need} bonnes réponses pour le badge ${pr.next.name}` : 'Badge Or obtenu, bravo !';
-            info.append(name, sub2);
-            if (pr.next) {
-                const bar = document.createElement('div');
-                bar.className = 'badge-bar';
-                const fill = document.createElement('i');
-                fill.style.width = `${Math.min(100, Math.round((pr.ok / pr.need) * 100))}%`;
-                bar.appendChild(fill);
-                info.appendChild(bar);
+            if (c.tier) total++;
+            const card = el('div', `pcard ${c.tier ? 't' + c.tier : 'locked'}`);
+            const top = el('div', 'ptop');
+            top.append(el('span', 'ovr', c.tier ? String(c.ovr) : '?'), el('span', 'pos', P.POSITIONS[sub.id] || ''));
+            const art = el('div', 'art', c.tier ? sub.emoji : '🔒');
+            const name = el('div', 'pname', skill.label);
+            card.append(top, art, name);
+            if (c.tier) {
+                const stats = el('div', 'pstats');
+                [['PRÉ', c.pre], ['VIT', c.vit], ['EXP', c.exp]].forEach(([k, v]) => { const s = el('div'); s.append(el('b', null, String(v)), document.createTextNode(k)); stats.appendChild(s); });
+                card.appendChild(stats);
+            } else {
+                card.appendChild(el('div', 'plock', `${pr.ok} / ${pr.need}`));
             }
-            row.append(icon, info);
-            root.appendChild(row);
+            if (c.tier) card.title = `Carte ${TIERS[c.tier - 1].name}`;
+            grid.appendChild(card);
         });
+        root.appendChild(grid);
     });
-    $('badges-total').textContent = `${total} badge${total > 1 ? 's' : ''} sur ${SKILLS.length}`;
+    $('badges-total').textContent = `${total} carte${total > 1 ? 's' : ''} sur ${SKILLS.length}`;
 }
 
 // ---------- Séance ----------
@@ -239,7 +280,7 @@ function startSession(mode, subject) {
     const questions = buildSession(p, mode, subject);
     S.saveProfiles(); // les erreurs reprises ont quitté le carnet
     if (!questions.length) return;
-    game = { mode, subject, questions, index: 0, score: 0, streak: 0, correct: 0, timer: 0, locked: false, newBadges: [] };
+    game = { mode, subject, questions, index: 0, score: 0, streak: 0, correct: 0, timer: 0, locked: false, newBadges: [], against: 0, maxStreak: 0 };
     begin();
 }
 
@@ -247,12 +288,20 @@ function resumeSession() {
     const p = S.currentProfile();
     const saved = p && S.loadSession(p.id);
     if (!saved) return;
-    game = { newBadges: [], ...saved, locked: false };
+    game = { newBadges: [], maxStreak: 0, ...saved, locked: false };
+    if (game.against === undefined) game.against = Math.max(0, game.index - game.correct);
     begin();
 }
 
+function updateBoard() {
+    $('goals-for').textContent = game.correct;
+    $('goals-against').textContent = game.against;
+}
 function begin() {
     scoreDisplay.textContent = `Score: ${game.score}`;
+    const isMatch = game.mode === 'daily';
+    $('match-board').classList.toggle('hidden', !isMatch);
+    if (isMatch) { $('opponent-name').textContent = P.opponentOf(); updateBoard(); }
     show('game');
     startTimer();
     nextQuestion();
@@ -262,7 +311,7 @@ function persistSession() {
     const p = S.currentProfile();
     if (!p || !game) return;
     if (game.index >= game.questions.length) S.clearSession(p.id);
-    else S.saveSession(p.id, { mode: game.mode, subject: game.subject, questions: game.questions, index: game.index, score: game.score, streak: game.streak, correct: game.correct, timer: game.timer, newBadges: game.newBadges });
+    else S.saveSession(p.id, { mode: game.mode, subject: game.subject, questions: game.questions, index: game.index, score: game.score, streak: game.streak, correct: game.correct, timer: game.timer, newBadges: game.newBadges, against: game.against, maxStreak: game.maxStreak });
 }
 
 function startTimer() {
@@ -316,16 +365,20 @@ function onAnswer(correct, given) {
     if (correct) {
         game.correct++;
         game.streak++;
+        game.maxStreak = Math.max(game.maxStreak, game.streak);
         game.score += game.streak >= 3 ? 150 : (game.streak >= 2 ? 120 : 100);
-        showFeedback(badge ? `${badge.tier.emoji} BADGE ${badge.tier.name.toUpperCase()} !` : (game.streak >= 3 ? '🔥 INCROYABLE !' : '✨ BIEN JOUÉ !'));
+        showFeedback(badge ? `${badge.tier.emoji} BADGE ${badge.tier.name.toUpperCase()} !` : (game.mode === 'daily' ? (game.streak >= 3 ? '⚽ BUT ! 🔥' : '⚽ BUT !') : (game.streak >= 3 ? '🔥 INCROYABLE !' : '✨ BIEN JOUÉ !')));
+        if (game.mode === 'daily') updateBoard();
         playSound(440 + game.streak * 50, 'triangle', 0.2);
         scoreDisplay.textContent = `Score: ${game.score}`;
         S.saveProfiles();
         setTimeout(() => { game.index++; nextQuestion(); }, 1500);
     } else {
         game.streak = 0;
+        game.against++;
         playSound(150, 'sawtooth', 0.3);
-        showFeedback('🚀 OUUPSS !');
+        showFeedback(game.mode === 'daily' ? '🥅 BUT ADVERSE' : '🚀 OUUPSS !');
+        if (game.mode === 'daily') updateBoard();
         S.saveProfiles();
         stopTimer();
         explanationBox.classList.remove('hidden');
@@ -355,39 +408,51 @@ function endGame() {
     stopTimer();
     const p = S.currentProfile();
     const previousXP = p.totalXP;
-    p.totalXP += game.score;
+    const total = game.questions.length;
+    const isMatch = game.mode === 'daily';
+    P.ensureSeason(p);
+
+    // match du jour : résultat, bonus d'XP, adversaire du jour
+    let outcome = null;
+    let bonus = 0;
+    const opponent = P.opponentOf();
+    if (isMatch) {
+        outcome = P.recordMatch(p, game.correct, game.against, opponent);
+        bonus = P.MATCH_BONUS[outcome];
+    }
+    const gained = game.score + bonus;
+    p.totalXP += gained;
+    const newLeague = P.addSeasonXP(p, gained);
     const wasDone = doneToday(p);
     const streak = completeSession(p);
+    const records = P.updateRecords(p, { score: gained, maxStreak: game.maxStreak, goalDiff: isMatch ? Math.max(0, game.correct - game.against) : 0 });
     S.saveProfiles();
     S.clearSession(p.id);
 
     show('end');
-    $('final-score').textContent = game.score;
-    const total = game.questions.length;
+    $('final-score').textContent = gained;
+    $('end-title').textContent = isMatch ? { win: 'Victoire !', draw: 'Match nul', loss: 'Fin du match' }[outcome] : 'Mission terminée !';
+    const matchBox = $('end-match');
+    matchBox.classList.toggle('hidden', !isMatch);
+    matchBox.replaceChildren();
+    if (isMatch) {
+        matchBox.append(el('div', 'end-match-score', `⚽ ${game.correct} – ${game.against} ${opponent}`), el('div', `end-match-result ${outcome}`, P.OUTCOME_LABEL[outcome]));
+        if (bonus) matchBox.appendChild(el('div', 'muted', `Bonus de match : +${bonus} XP`));
+    }
     let msg;
     if (game.correct === total) msg = `PARFAIT ! ${total} sur ${total}, tu es un véritable génie !`;
     else if (game.correct >= total * 0.7) msg = 'Excellent travail, tu maîtrises bien ces notions !';
     else msg = 'Bien joué ! Continue de t\'entraîner pour devenir encore plus fort.';
     const endMessage = $('end-message');
     endMessage.textContent = `${msg} (${game.correct}/${total})`;
-    const line = document.createElement('div');
-    line.className = 'end-total';
-    line.textContent = `Total XP : ${p.totalXP}`;
-    endMessage.appendChild(line);
-    if (!wasDone) {
-        const daily = document.createElement('div');
-        daily.className = 'end-total';
-        daily.textContent = `✅ Mission du jour accomplie — 🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite`;
-        endMessage.appendChild(daily);
-    }
+    const addLine = text => endMessage.appendChild(el('div', 'end-total', text));
+    addLine(`Total XP : ${p.totalXP}`);
+    if (!wasDone) addLine(`✅ Mission du jour accomplie — 🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite`);
+    if (newLeague) addLine(`🏟️ Tu passes en ${newLeague.emoji} ${newLeague.name} cette saison !`);
     const box = $('end-badges');
     box.replaceChildren();
-    game.newBadges.forEach(b => {
-        const d = document.createElement('div');
-        d.className = 'new-badge';
-        d.textContent = `${b.tier.emoji} Badge ${b.tier.name} : ${b.label}`;
-        box.appendChild(d);
-    });
+    records.forEach(r => box.appendChild(el('div', 'new-badge', `🏆 Nouveau record ! ${r}`)));
+    game.newBadges.forEach(b => box.appendChild(el('div', 'new-badge', `${b.tier.emoji} Nouvelle carte ${b.tier.name} : ${b.label}`)));
     game = null;
     checkPSGMilestones(previousXP, p.totalXP);
 }
@@ -405,30 +470,16 @@ function checkPSGMilestones(oldXP, newXP) {
     if (reached) setTimeout(() => showSpecialReward(reached), 1000);
 }
 
-function showSpecialReward(reward) {
-    const overlay = document.createElement('div');
-    overlay.className = 'reward-overlay';
-    const card = document.createElement('div');
-    card.className = 'reward-card animate-pop';
-    const title = document.createElement('h2');
-    title.textContent = 'RÉCOMPENSE PSG 🔴🔵';
-    const trophy = document.createElement('div');
-    trophy.className = 'reward-trophy';
-    trophy.textContent = '🏆';
-    const player = document.createElement('div');
-    player.className = 'reward-player';
-    player.textContent = `Palier ${reward.player}`;
-    const msg = document.createElement('div');
-    msg.className = 'reward-msg';
-    msg.textContent = reward.msg;
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-primary btn-block';
-    btn.textContent = 'CONTINUER L\'AVENTURE';
+function showOverlay({ title, emoji, headline, text, button }) {
+    const overlay = el('div', 'reward-overlay');
+    const card = el('div', 'reward-card animate-pop');
+    const btn = el('button', 'btn btn-primary btn-block', button || 'CONTINUER L\'AVENTURE');
     btn.onclick = () => overlay.remove();
-    card.append(title, trophy, player, msg, btn);
+    card.append(el('h2', null, title), el('div', 'reward-trophy', emoji), el('div', 'reward-player', headline), el('div', 'reward-msg', text), btn);
     overlay.appendChild(card);
     document.body.appendChild(overlay);
 }
+const showSpecialReward = r => showOverlay({ title: 'RÉCOMPENSE PSG 🔴🔵', emoji: '🏆', headline: `Palier ${r.player}`, text: r.msg });
 
 // ---------- Réglages ----------
 $('setting-timer').addEventListener('change', e => S.setSettings({ ...S.getSettings(), timer: e.target.checked }));
