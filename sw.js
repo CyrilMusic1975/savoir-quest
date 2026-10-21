@@ -1,5 +1,5 @@
 // Incrémenter VERSION à chaque publication pour forcer la mise à jour du cache
-const VERSION = 'sq-v4';
+const VERSION = 'sq-v5';
 const FILES = [
     './', 'index.html', 'style.css', 'script.js', 'manifest.webmanifest',
     'icons/icon-192.png', 'icons/icon-512.png'

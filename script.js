@@ -723,8 +723,8 @@ function nextQuestion() {
         marker.style.left = `${markerPos}%`;
         marker.innerHTML = '<div class="label">A</div><div class="arrow"></div>';
 
+        axis.appendChild(marker); // le repère suit la ligne (même repère de position)
         container.appendChild(axis);
-        container.appendChild(marker);
         visualArea.appendChild(container);
     } else if (q.visual && q.visual.type === 'conversion-table') {
         const container = document.createElement('div');
