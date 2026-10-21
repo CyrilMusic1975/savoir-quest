@@ -1,5 +1,5 @@
 // Incrémenter VERSION à chaque publication pour forcer la mise à jour du cache
-const VERSION = 'sq-v9';
+const VERSION = 'sq-v10';
 const FILES = [
     './', 'index.html', 'style.css', 'manifest.webmanifest',
     'js/main.js', 'js/sync.js', 'js/state.js', 'js/engine.js', 'js/render.js',

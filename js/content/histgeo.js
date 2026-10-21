@@ -50,10 +50,10 @@ const motsData = [
     ['hg_f06', 'Densité de population', 'Nombre d\'habitants par kilomètre carré.'],
     ['hg_f07', 'Littoral', 'Zone de contact entre la terre et la mer.']
 ];
-const mots = motsData.map(([id, mot, def], i) => {
+// Deux définitions proposées, il choisit la bonne. Deux variantes par mot : la mauvaise définition change.
+const mots = motsData.flatMap(([id, mot, def], i) => {
     const wrongs = motsData.filter((_, j) => j !== i).map(m => m[2]);
-    const picked = [wrongs[i % wrongs.length], wrongs[(i + 2) % wrongs.length], wrongs[(i + 4) % wrongs.length]];
-    return qcm(id, `Que signifie « ${mot} » ?`, def, [...new Set(picked)].filter(w => w !== def), `${mot} : ${def}`);
+    return [0, 3].map((shift, v) => qcm(v ? `${id}b` : id, `Quelle est la bonne définition de « ${mot} » ?`, def, [wrongs[(i + shift) % wrongs.length]], `${mot} : ${def}`));
 });
 export const histgeoSkills = [
     { id: 'hg_prehistoire', subject: 'histgeo', label: 'Préhistoire et Néolithique', bank: prehistoire },
