@@ -411,28 +411,12 @@ importInput.addEventListener('change', async () => {
 });
 
 // ---------- Suivi parent ----------
-const parentStatus = $('parent-status');
-function updateParentUI() {
-    const linked = Sync.isLinked();
-    parentStatus.textContent = linked
-        ? `Activé ✅${Sync.pending() ? ` (${Sync.pending()} résultat(s) en attente d'envoi)` : ''}`
-        : 'Non activé.';
-    $('parent-link-form').classList.toggle('hidden', linked);
-    $('parent-unlink-btn').classList.toggle('hidden', !linked);
+function updateSyncUI() {
+    const n = Sync.pending();
+    $('sync-pending').textContent = n ? `(${n} résultat(s) en attente d'envoi)` : '';
 }
-$('parent-link-btn').addEventListener('click', async () => {
-    const btn = $('parent-link-btn');
-    btn.disabled = true;
-    parentStatus.textContent = 'Association en cours…';
-    const ok = await Sync.link($('parent-code-input').value);
-    btn.disabled = false;
-    if (ok) $('parent-code-input').value = '';
-    updateParentUI();
-    if (!ok) parentStatus.textContent = 'Code non reconnu, ou pas de réseau. Vérifie le code et réessaie.';
-});
-$('parent-unlink-btn').addEventListener('click', () => { Sync.unlink(); updateParentUI(); });
-updateParentUI();
-setInterval(updateParentUI, 5000);
+updateSyncUI();
+setInterval(updateSyncUI, 5000);
 
 // ---------- PWA : hors ligne + stockage durable ----------
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

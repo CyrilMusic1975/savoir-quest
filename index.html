@@ -47,13 +47,7 @@
                     <label class="setting"><input type="checkbox" id="setting-sound"> Sons</label>
                     <div class="parent-link">
                         <div class="setting-title">👪 Suivi parent</div>
-                        <p id="parent-status">Non activé.</p>
-                        <div id="parent-link-form">
-                            <input type="text" id="parent-code-input" class="answer-input small" placeholder="Code de tes parents" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="14">
-                            <button id="parent-link-btn" class="btn btn-secondary">Activer le suivi</button>
-                        </div>
-                        <button id="parent-unlink-btn" class="btn btn-secondary hidden">Arrêter le suivi</button>
-                        <p class="parent-info">Quand le suivi est activé, tes parents voient : le prénom de ton profil, la matière, si tu as bien répondu, la date, et les questions que tu rates avec ta réponse. Rien d'autre.</p>
+                        <p class="parent-info">Tes parents voient : le prénom de ton profil, la matière, si tu as bien répondu, la date, et les questions que tu rates avec ta réponse. Rien d'autre. <span id="sync-pending"></span></p>
                     </div>
                     <p>Télécharge un fichier pour ne jamais perdre tes points, ou restaure-le sur un autre appareil.</p>
                     <div class="backup-actions">
@@ -63,7 +57,7 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v7</div>
+                <div class="version">v8</div>
             </div>
         </div>
 
