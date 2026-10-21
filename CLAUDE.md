@@ -33,6 +33,6 @@ python3 -m http.server 8123   # serveur local (les modules JS ne marchent pas en
 
 ## Éléments hors de ce dépôt
 
-- `~/Desktop/SavoirQuest-suivi` : règles Firestore, tableau de bord parent, hébergement Firebase (projet `savoir-quest-suivi`). Toujours passer `--project savoir-quest-suivi` aux commandes `firebase`.
+- `~/Desktop/SavoirQuest-suivi` (dépôt privé `savoir-quest-suivi`) : règles Firestore, tableau de bord parent, hébergement Firebase (projet `savoir-quest-suivi`). Toujours passer `--project savoir-quest-suivi` aux commandes `firebase`.
 - `~/Desktop/SavoirQuest-bilans` (dépôt privé) : bilan hebdomadaire et rappel quotidien (GitHub Actions). Secrets : `FIREBASE_SA_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`.
 - Après l'ajout de compétences, régénérer les libellés du tableau de bord (voir le README de `SavoirQuest-suivi`).

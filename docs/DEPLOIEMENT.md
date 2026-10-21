@@ -5,7 +5,7 @@
 | Élément | Où | Hébergé par | Publication |
 |---|---|---|---|
 | Application | Ce dépôt (public) | GitHub Pages, branche `main` | `git push` |
-| Suivi parent | Dossier local `SavoirQuest-suivi` | Firebase (projet `savoir-quest-suivi`) | `firebase deploy` |
+| Suivi parent | Dépôt privé `savoir-quest-suivi` (copie locale `SavoirQuest-suivi`) | Firebase (projet `savoir-quest-suivi`) | `./deploy.sh` |
 | Tâches planifiées | Dépôt privé `savoir-quest-bilans` | GitHub Actions | `git push` |
 
 ## Publier l'application
@@ -35,7 +35,7 @@
 
 ## Suivi parent (Firebase)
 
-Dossier `SavoirQuest-suivi/` (voir son README) : règles Firestore, page web du tableau de bord, configuration d'hébergement.
+Dépôt privé `savoir-quest-suivi` (voir son README) : règles Firestore, page web du tableau de bord, configuration d'hébergement.
 
 ```bash
 cd SavoirQuest-suivi

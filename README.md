@@ -70,7 +70,7 @@ Les modules JavaScript ne fonctionnent pas en ouvrant `index.html` directement d
 Le projet se compose de trois éléments :
 
 1. **Cette application** (dépôt public) : le jeu, hébergé sur GitHub Pages.
-2. **Le suivi parent** (dossier local `SavoirQuest-suivi`) : base Firestore, règles de sécurité et tableau de bord web protégé par une connexion Google, hébergés par Firebase.
+2. **Le suivi parent** (dépôt privé `savoir-quest-suivi`) : base Firestore, règles de sécurité et tableau de bord web protégé par une connexion Google, hébergés par Firebase.
 3. **Les tâches planifiées** (dépôt privé `savoir-quest-bilans`) : bilan hebdomadaire envoyé chaque lundi et rappel quotidien de 17 h 30, exécutés par GitHub Actions.
 
 ## Licence et contenus
