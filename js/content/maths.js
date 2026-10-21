@@ -1,7 +1,13 @@
 import { shuffle, pick, randInt, fmtNum, generateOptions, numOptions, qcm } from './helpers.js';
 
 // Renseigné par le moteur avant chaque génération (maîtrise du profil actif)
-export const ctx = { mastery: {} };
+export const ctx = { mastery: {}, weak: {} };
+
+// Une fois sur deux, on cible une facette que le joueur rate (ex : les millièmes, la table 7×8)
+function weakFacet(skillId) {
+    const list = ctx.weak[skillId];
+    return list && list.length && Math.random() < 0.5 ? list[Math.floor(Math.random() * list.length)] : null;
+}
 
 // ===== Générateurs d'origine (conservés tels quels) =====
 export function generateUnitConversionQuestion() {
@@ -142,10 +148,13 @@ export function generateSimpleMultiplicationQuestion() {
             metadata: { type: 'expert', factors: [n1, n2] }
         };
     } else {
-        const n1 = 2 + Math.floor(Math.random() * 8); // 2 to 9
-        const n2 = 2 + Math.floor(Math.random() * 8);
+        let n1 = 2 + Math.floor(Math.random() * 8); // 2 to 9
+        let n2 = 2 + Math.floor(Math.random() * 8);
+        const wf = weakFacet('math_multiplication');
+        if (wf) [n1, n2] = wf.split('×').map(Number);
         const a = n1 * n2;
         return {
+            facet: `${Math.min(n1, n2)}×${Math.max(n1, n2)}`,
             text: `Multiplication : combien font ${n1} x ${n2} ?`,
             options: generateOptions(a.toString(), true),
             answer: a.toString(),
@@ -325,10 +334,11 @@ function digitAt(num, placeName) {
 }
 
 export function generateDigitRankQuestion() {
-    const withThousands = Math.random() < 0.4;
+    const forced = PLACES.find(p => p.name === weakFacet('dec_chiffre'));
+    const withThousands = forced ? forced.name === 'milliers' || Math.random() < 0.4 : Math.random() < 0.4;
     const num = randomDecimalDigits(withThousands);
     const places = PLACES.filter(p => withThousands || p.name !== 'milliers');
-    const place = pick(places);
+    const place = forced || pick(places);
     const answer = String(digitAt(num, place.name));
     const all = [...num.intDigits, ...num.decDigits].map(String);
     const wrongs = shuffle([...new Set(all)].filter(d => d !== answer)).slice(0, 3);
@@ -337,13 +347,14 @@ export function generateDigitRankQuestion() {
     q.options = shuffle(q.options);
     delete q.id;
     q.type = 'decimal';
+    q.facet = place.name;
     q.explanation = `Avant la virgule : unités, puis dizaines, centaines, milliers en allant vers la gauche. Après la virgule : dixièmes, centièmes, millièmes en allant vers la droite. Ici le chiffre des ${place.name} est ${answer}.`;
     return q;
 }
 
 export function generateDigitValueQuestion() {
     const num = randomDecimalDigits(false);
-    const place = pick(PLACES.filter(p => p.den));
+    const place = PLACES.find(p => p.den && p.name === weakFacet('dec_valeur')) || pick(PLACES.filter(p => p.den));
     const d = digitAt(num, place.name);
     const dd = d === 0 ? 5 : d;
     if (d === 0) num.decDigits[PLACES.indexOf(place) - 4] = dd;
@@ -353,6 +364,7 @@ export function generateDigitValueQuestion() {
     q.options = shuffle(q.options);
     delete q.id;
     q.type = 'decimal';
+    q.facet = place.name;
     q.explanation = `Le chiffre des ${place.name} vaut ${answer} : il faut écrire le chiffre au-dessus d'une fraction dont le dénominateur est ${place.den}.`;
     return q;
 }

@@ -1,8 +1,8 @@
 // Incrémenter VERSION à chaque publication pour forcer la mise à jour du cache
-const VERSION = 'sq-v6';
+const VERSION = 'sq-v7';
 const FILES = [
     './', 'index.html', 'style.css', 'manifest.webmanifest',
-    'js/main.js', 'js/state.js', 'js/engine.js', 'js/render.js',
+    'js/main.js', 'js/sync.js', 'js/state.js', 'js/engine.js', 'js/render.js',
     'js/content/index.js', 'js/content/helpers.js', 'js/content/maths.js', 'js/content/francais.js',
     'js/content/sciences.js', 'js/content/histgeo.js',
     'icons/icon-192.png', 'icons/icon-512.png'

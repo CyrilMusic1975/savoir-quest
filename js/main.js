@@ -2,6 +2,7 @@ import { SUBJECTS } from './content/index.js';
 import * as S from './state.js';
 import { buildSession, recordAnswer, completeSession, countToReview, countDue, currentStreak, doneToday } from './engine.js';
 import { renderQuestion } from './render.js';
+import * as Sync from './sync.js';
 
 const $ = id => document.getElementById(id);
 const screens = { home: $('home-screen'), subjects: $('subject-screen'), game: $('game-screen'), end: $('end-screen') };
@@ -247,12 +248,18 @@ function nextQuestion() {
     renderQuestion(q, { visualArea, optionsBox }, onAnswer);
 }
 
-function onAnswer(correct) {
+function onAnswer(correct, given) {
     if (game.locked) return;
     game.locked = true;
     const q = game.questions[game.index];
     const p = S.currentProfile();
     recordAnswer(p, q, correct);
+    Sync.logEvent({
+        profile: p.name, skill: q.skill || q.generatorId, subject: q.subject, qid: q.id, facet: q.facet, correct,
+        given: correct ? undefined : given,
+        ans: correct ? undefined : q.answer,
+        qtext: correct ? undefined : [q.visual && q.visual.content, q.text].filter(Boolean).join(' — ')
+    });
 
     if (correct) {
         game.correct++;
@@ -402,6 +409,30 @@ importInput.addEventListener('change', async () => {
         backupStatus.textContent = 'Ce fichier n\'est pas une sauvegarde Savoir Quest valide.';
     }
 });
+
+// ---------- Suivi parent ----------
+const parentStatus = $('parent-status');
+function updateParentUI() {
+    const linked = Sync.isLinked();
+    parentStatus.textContent = linked
+        ? `Activé ✅${Sync.pending() ? ` (${Sync.pending()} résultat(s) en attente d'envoi)` : ''}`
+        : 'Non activé.';
+    $('parent-link-form').classList.toggle('hidden', linked);
+    $('parent-unlink-btn').classList.toggle('hidden', !linked);
+}
+$('parent-link-btn').addEventListener('click', async () => {
+    const btn = $('parent-link-btn');
+    btn.disabled = true;
+    parentStatus.textContent = 'Association en cours…';
+    const ok = await Sync.link($('parent-code-input').value);
+    btn.disabled = false;
+    if (ok) $('parent-code-input').value = '';
+    updateParentUI();
+    if (!ok) parentStatus.textContent = 'Code non reconnu, ou pas de réseau. Vérifie le code et réessaie.';
+});
+$('parent-unlink-btn').addEventListener('click', () => { Sync.unlink(); updateParentUI(); });
+updateParentUI();
+setInterval(updateParentUI, 5000);
 
 // ---------- PWA : hors ligne + stockage durable ----------
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

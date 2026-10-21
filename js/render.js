@@ -66,7 +66,7 @@ function renderQcm(q, box, submit) {
             const ok = opt === q.answer;
             btn.classList.add(ok ? 'correct' : 'wrong');
             if (!ok) box.querySelectorAll('button').forEach(b => { if (b.textContent === q.answer) b.classList.add('correct'); });
-            submit(ok);
+            submit(ok, opt);
         };
         box.appendChild(btn);
     });
@@ -95,7 +95,7 @@ function renderInput(q, box, submit) {
         const ok = (q.accept || [q.answer]).some(a => sameAnswer(input.value, a));
         input.classList.add(ok ? 'correct' : 'wrong');
         if (!ok) result.textContent = `Réponse attendue : ${q.answer}`;
-        submit(ok);
+        submit(ok, input.value.trim());
     };
     btn.onclick = check;
     input.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
@@ -128,7 +128,7 @@ function renderTap(q, box, submit) {
             if (good.has(i)) b.classList.add('correct');
             else if (chosen.has(i)) b.classList.add('wrong');
         });
-        submit(ok);
+        submit(ok, [...chosen].sort((a, b) => a - b).map(i => q.tokens[i]).join(' '));
     };
     box.append(sentence, validate);
 }
@@ -166,7 +166,7 @@ function renderOrder(q, box, submit) {
         validate.disabled = true;
         const ok = placed.every((item, i) => item === q.items[i]);
         line.querySelectorAll('.order-item').forEach((b, i) => b.classList.add(placed[i] === q.items[i] ? 'correct' : 'wrong'));
-        submit(ok);
+        submit(ok, placed.join(' → '));
     };
     box.append(hint, line, bank, validate);
     draw();
@@ -233,7 +233,7 @@ function renderMatch(q, box, submit) {
             btnsL[l].classList.add(good ? 'correct' : 'wrong');
             btnsR[links.get(l)].classList.add(good ? 'correct' : 'wrong');
         });
-        submit(ok);
+        submit(ok, [...links.entries()].map(([l, rv]) => `${l} = ${rv}`).join(' ; '));
     };
     const grid = el('div', 'match-grid');
     grid.append(colL, colR);

@@ -64,8 +64,22 @@ export function countDue(profile) {
 }
 
 // mode : 'daily' (mission du jour, toutes matières), 'subject' (une matière), 'errors' (carnet d'erreurs)
+// Facettes ratées par compétence : au moins 2 essais et moins de 60 % de réussite
+function weakFacets(profile) {
+    const out = {};
+    Object.entries(profile.facets).forEach(([skill, facets]) => {
+        const weak = Object.entries(facets)
+            .filter(([, st]) => st.total >= 2 && st.ok / st.total < 0.6)
+            .sort((a, b) => a[1].ok / a[1].total - b[1].ok / b[1].total)
+            .map(([name]) => name);
+        if (weak.length) out[skill] = weak;
+    });
+    return out;
+}
+
 export function buildSession(profile, mode, subject) {
     ctx.mastery = profile.mastery;
+    ctx.weak = weakFacets(profile);
     const qs = [];
     const used = new Set();
     const add = q => {
@@ -124,6 +138,13 @@ export function recordAnswer(profile, q, correct) {
             profile.levels[id] = level + 1;
             profile.recent[id] = [];
         }
+    }
+    if (q.facet && id) {
+        const f = ((profile.facets[id] = profile.facets[id] || {})[q.facet] = profile.facets[id][q.facet] || { ok: 0, total: 0 });
+        f.total++;
+        if (correct) f.ok++;
+        // on oublie progressivement les anciens essais pour que la facette puisse se "guérir"
+        if (f.total > 12) { f.ok = Math.round(f.ok * 0.75); f.total = Math.round(f.total * 0.75); }
     }
     const subj = subjectOf(q);
     if (subj) {

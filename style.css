@@ -677,3 +677,12 @@ p {
     .stats-bar { flex-wrap: nowrap; gap: 0.5rem; }
     #level-title { flex: 1; font-size: 0.8rem; text-align: center; }
 }
+
+/* Suivi parent */
+.parent-link { margin: 0.5rem 0 1rem; padding: 0.75rem; background: rgba(255,255,255,0.04); border-radius: 0.8rem; }
+.setting-title { font-weight: 700; margin-bottom: 0.25rem; }
+.parent-link p { margin: 0.4rem 0; font-size: 0.95rem; }
+.parent-link .parent-info { font-size: 0.85rem; color: var(--text-muted); }
+#parent-link-form { display: flex; flex-direction: column; gap: 0.6rem; }
+.answer-input.small { font-size: 1.2rem; padding: 0.75rem; letter-spacing: 0.1em; }
+.parent-link .btn { width: 100%; justify-content: center; margin-top: 0.4rem; }
