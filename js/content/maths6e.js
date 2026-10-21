@@ -274,8 +274,8 @@ const decPartiesCours = [
 const geoCours = [
     qcm('geo_c01', 'Un point est…', 'le plus petit élément de l\'espace', ['un petit rond sur la feuille', 'un trait très court', 'un ensemble de lignes'], 'Un point désigne un emplacement. On le représente par une croix, à l\'intersection de deux petits traits.'),
     qcm('geo_c02', 'Comment nomme-t-on un point ?', 'Avec une seule lettre majuscule', ['Avec deux lettres', 'Avec une lettre minuscule', 'Avec un chiffre'], 'On nomme toujours un point avec une seule lettre majuscule : A, B, C…'),
-    tf('geo_c03', 'Un point est infiniment petit.', true, 'Pour le montrer sur un dessin, on le représente par une croix.'),
-    tf('geo_c04', 'La longueur d\'un point vaut 1.', false, 'Un point est infiniment petit : sa longueur est 0.'),
+    tf('geo_c03', 'En géométrie, un point est infiniment petit (il n\'a pas de taille).', true, 'Un point géométrique est une idée : il n\'a ni longueur ni largeur. Ce qu\'on dessine (une croix, un point de crayon) n\'est qu\'une représentation : au microscope, la marque devient énorme, mais le vrai point garde une taille de zéro. On le dessine par une croix, à l\'intersection de deux traits, pour montrer un emplacement précis.'),
+    tf('geo_c04', 'En géométrie, la longueur d\'un point vaut 1.', false, 'Un point n\'a pas de taille : sa longueur est 0. Le point que l\'on dessine n\'est qu\'une représentation du vrai point.'),
     tf('geo_c05', 'Un point désigne seulement une position.', true, 'Un point désigne un emplacement, une position dans l\'espace.', 2),
     tf('geo_c06', 'Une ligne contient une infinité de points.', true, 'Une ligne est un ensemble de points qui se suivent continuellement.'),
     tf('geo_c07', 'Une ligne n\'a pas de longueur.', false, 'Une ligne a une longueur, finie ou infinie.', 2),
