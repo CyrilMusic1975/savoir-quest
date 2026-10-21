@@ -291,7 +291,11 @@ p {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 5rem;
+    font-size: clamp(2.2rem, 12vw, 4.5rem);
+    width: 90%;
+    text-align: center;
+    line-height: 1.1;
+    font-weight: 800;
     pointer-events: none;
     z-index: 100;
 }
@@ -601,3 +605,75 @@ p {
 }
 
 .version { margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-muted); opacity: 0.7; }
+
+/* ===== Lot 2 : accueil, matières, nouveaux types d'exercices ===== */
+.home-actions { gap: 0.75rem; }
+.home-actions .btn { width: 100%; justify-content: center; }
+.streak-info { margin-top: 0.75rem; color: var(--streak-gold); font-weight: 600; font-size: 1rem; }
+.setting { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; font-size: 1.05rem; }
+.setting input { width: 1.4rem; height: 1.4rem; accent-color: var(--primary); }
+
+.subjects-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+.subject-card { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 1rem; text-align: left; padding: 1rem 1.25rem; min-height: 4.5rem; background: var(--surface); color: var(--text); border: 2px solid rgba(148, 163, 184, 0.35); border-radius: 1rem; cursor: pointer; font-size: 1.15rem; font-weight: 600; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.subject-card:active { transform: scale(0.98); }
+.subject-emoji { font-size: 2rem; grid-row: span 2; }
+.subject-pct { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
+
+.quit-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); color: var(--text); width: 2.5rem; height: 2.5rem; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; }
+
+/* Saisie */
+.input-wrap { display: flex; flex-direction: column; gap: 0.75rem; }
+.answer-input { width: 100%; padding: 1rem; font-size: 1.5rem; text-align: center; font-weight: 700; color: var(--text); background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(148, 163, 184, 0.5); border-radius: 1rem; outline: none; }
+.answer-input:focus { border-color: var(--accent); }
+.answer-input.correct { border-color: var(--success); background: rgba(16, 185, 129, 0.25); }
+.answer-input.wrong { border-color: var(--error); background: rgba(239, 68, 68, 0.25); }
+.input-result { color: var(--accent); font-weight: 700; font-size: 1.1rem; min-height: 1.4em; }
+
+/* Toucher les mots */
+.token-line { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
+.token { padding: 0.7rem 0.9rem; min-height: 3rem; font-size: 1.2rem; font-weight: 600; color: var(--text); background: var(--surface); border: 2px solid rgba(148, 163, 184, 0.35); border-radius: 0.8rem; cursor: pointer; touch-action: manipulation; }
+.token.selected { border-color: var(--accent); background: rgba(34, 211, 238, 0.2); }
+.token.correct { border-color: var(--success); background: rgba(16, 185, 129, 0.3); }
+.token.wrong { border-color: var(--error); background: rgba(239, 68, 68, 0.3); }
+
+/* Remettre dans l'ordre */
+.order-hint { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.75rem; }
+.order-line { list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; min-height: 1rem; }
+.order-line li { counter-increment: step; display: flex; align-items: center; gap: 0.6rem; }
+.order-line li::before { content: counter(step); flex: 0 0 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: var(--primary); font-weight: 800; }
+.order-pool { display: flex; flex-direction: column; gap: 0.5rem; }
+.order-item { width: 100%; text-align: left; padding: 0.8rem 1rem; min-height: 3rem; font-size: 1.1rem; font-weight: 600; color: var(--text); background: var(--surface); border: 2px solid rgba(148, 163, 184, 0.35); border-radius: 0.8rem; cursor: pointer; touch-action: manipulation; }
+.order-item.placed { border-color: var(--accent); background: rgba(34, 211, 238, 0.15); }
+.order-item.correct { border-color: var(--success); background: rgba(16, 185, 129, 0.3); }
+.order-item.wrong { border-color: var(--error); background: rgba(239, 68, 68, 0.3); }
+
+/* Associer */
+.match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+.match-col { display: flex; flex-direction: column; gap: 0.6rem; }
+.match-item { padding: 0.8rem 0.6rem; min-height: 3.5rem; font-size: 1rem; font-weight: 600; color: var(--text); background: var(--surface); border: 3px solid rgba(148, 163, 184, 0.35); border-radius: 0.8rem; cursor: pointer; touch-action: manipulation; overflow-wrap: anywhere; }
+.match-item.selected { background: rgba(34, 211, 238, 0.2); }
+.match-item.correct { background: rgba(16, 185, 129, 0.3); border-color: var(--success) !important; }
+.match-item.wrong { background: rgba(239, 68, 68, 0.3); border-color: var(--error) !important; }
+
+/* Cartes mémoire */
+.flashcard { background: rgba(255, 255, 255, 0.05); border: 2px dashed rgba(148, 163, 184, 0.5); border-radius: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+.flash-hint { color: var(--text-muted); font-size: 0.95rem; }
+.flash-answer { margin-top: 1rem; font-size: 1.25rem; font-weight: 700; color: var(--accent); line-height: 1.4; }
+.flash-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.correct-ghost { border-color: var(--success); }
+.wrong-ghost { border-color: var(--warning); }
+
+/* Récompense */
+.reward-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); display: flex; flex-direction: column; justify-content: safe center; align-items: center; z-index: 1000; overflow-y: auto; padding: 1rem; text-align: center; color: white; }
+.reward-card { background: linear-gradient(135deg, #004170, #da291c); padding: 2rem 1.5rem; border-radius: 2rem; border: 4px solid white; box-shadow: 0 0 50px rgba(218, 41, 28, 0.5); max-width: 500px; width: 100%; }
+.reward-card h2 { font-size: 1.6rem; margin-bottom: 1rem; letter-spacing: 1px; }
+.reward-trophy { font-size: 6rem; margin-bottom: 1rem; }
+.reward-player { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; }
+.reward-msg { font-size: 1.2rem; line-height: 1.4; }
+.reward-card .btn { margin-top: 1.5rem; }
+
+@media (max-width: 600px) {
+    .match-item { font-size: 0.95rem; }
+    .stats-bar { flex-wrap: nowrap; gap: 0.5rem; }
+    #level-title { flex: 1; font-size: 0.8rem; text-align: center; }
+}

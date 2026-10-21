@@ -20,29 +20,31 @@
         <div id="home-screen" class="screen">
             <div class="animate-pop">
                 <h1>Savoir Quest</h1>
-                <p>Prêt pour l'Odyssée des Connaissances ? Révise tes maths et ta grammaire !</p>
+                <p>Prêt pour l'Odyssée des Connaissances ? Révise toutes tes matières de 6e !</p>
 
                 <div id="profile-selection-area" class="mb-2">
                     <h2 class="section-title">Choisis ton profil</h2>
-                    <div id="profiles-grid" class="profiles-grid">
-                        <!-- Profils injectés ici -->
-                    </div>
+                    <div id="profiles-grid" class="profiles-grid"></div>
                     <button id="add-profile-btn" class="btn btn-secondary mt-1">+ NOUVEAU PROFIL</button>
                 </div>
 
                 <div id="active-profile-info" class="hidden mb-2">
-                    <div id="total-xp-display" class="xp-pill">
-                        Total XP : 0
-                    </div>
+                    <div id="total-xp-display" class="xp-pill">Total XP : 0</div>
+                    <div id="streak-info" class="streak-info"></div>
                 </div>
 
                 <div class="options-grid home-actions">
-                    <button id="start-btn" class="btn btn-primary hidden">COMMENCER L'AVENTURE</button>
+                    <button id="resume-btn" class="btn btn-secondary hidden">▶ REPRENDRE MA MISSION</button>
+                    <button id="daily-btn" class="btn btn-primary hidden">⭐ MISSION DU JOUR</button>
+                    <button id="subjects-btn" class="btn btn-secondary hidden">📚 CHOISIR UNE MATIÈRE</button>
+                    <button id="errors-btn" class="btn btn-secondary hidden">🔁 MES ERREURS</button>
                     <button id="switch-profile-btn" class="btn btn-secondary hidden">CHANGER DE PROFIL</button>
                 </div>
 
                 <details class="backup">
-                    <summary>💾 Sauvegarde de ma progression</summary>
+                    <summary>⚙️ Réglages et sauvegarde</summary>
+                    <label class="setting"><input type="checkbox" id="setting-timer"> Afficher le chrono</label>
+                    <label class="setting"><input type="checkbox" id="setting-sound"> Sons</label>
                     <p>Télécharge un fichier pour ne jamais perdre tes points, ou restaure-le sur un autre appareil.</p>
                     <div class="backup-actions">
                         <button id="export-btn" class="btn btn-secondary">Sauvegarder</button>
@@ -51,15 +53,26 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v5</div>
+                <div class="version">v6</div>
+            </div>
+        </div>
+
+        <!-- Choix de la matière -->
+        <div id="subject-screen" class="screen hidden">
+            <div class="animate-pop">
+                <h1>Ta matière</h1>
+                <p>Une mission de 10 questions dans la matière de ton choix.</p>
+                <div id="subjects-grid" class="subjects-grid"></div>
+                <button id="subjects-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
             </div>
         </div>
 
         <!-- Zone de Jeu -->
         <div id="game-screen" class="screen hidden">
             <div class="stats-bar">
+                <button id="quit-btn" class="quit-btn" aria-label="Quitter la mission (elle sera sauvegardée)">✕</button>
                 <span id="score-display">Score: 0</span>
-                <span id="level-title">Mission : ...</span>
+                <span id="level-title">Mission</span>
                 <span id="timer-display">Temps: 00s</span>
             </div>
 
@@ -74,14 +87,11 @@
                 <div id="question-text" class="question-text">Préparation de la mission...</div>
             </div>
 
-            <div id="options-container" class="options-grid" role="group" aria-label="Réponses">
-                <!-- Les boutons d'options seront insérés ici par JS -->
-            </div>
+            <div id="options-container" class="options-grid" role="group" aria-label="Réponses"></div>
 
-            <!-- Boîte d'explication pédagogique -->
             <div id="explanation-box" class="explanation-box hidden">
                 <div class="explanation-header">💡 Explication</div>
-                <div id="explanation-text" class="explanation-text">L'explication viendra ici...</div>
+                <div id="explanation-text" class="explanation-text"></div>
                 <button id="continue-btn" class="btn btn-primary btn-block">J'AI COMPRIS, ON CONTINUE !</button>
             </div>
         </div>
@@ -95,11 +105,10 @@
                     <div class="final-score" id="final-score">0</div>
                     <div class="muted">Points d'expérience gagnés</div>
                 </div>
-                <button id="restart-btn" class="btn btn-primary mt-2">RECOMMENCER</button>
+                <button id="restart-btn" class="btn btn-primary mt-2">REVENIR À L'ACCUEIL</button>
             </div>
         </div>
-
-    </div> <!-- end container -->
+    </div>
 
     <div id="feedback" role="status" aria-live="polite"></div>
 
@@ -116,7 +125,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>
