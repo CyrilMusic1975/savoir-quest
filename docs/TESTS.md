@@ -31,6 +31,6 @@ Un test ne doit pas recopier le code qu'il vérifie : les références (formes v
 ## Ce qui n'est pas couvert
 
 - L'interface dans un vrai navigateur (pas de test de bout en bout).
-- Les règles de sécurité Firestore : elles sont contrôlées par `check-rules.mjs` (dossier du suivi parent), qui vérifie 11 refus contre la base réelle, mais pas par l'émulateur ni dans la suite `npm test`.
+- Les règles de sécurité Firestore : elles sont contrôlées par `check-rules.mjs` (dossier du suivi parent), qui vérifie 15 refus contre la base réelle, mais pas par l'émulateur ni dans la suite `npm test`.
 - Le service worker, les notifications et la synchronisation hors ligne.
 - L'accessibilité (aucun outil d'audit automatisé).

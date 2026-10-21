@@ -73,6 +73,14 @@ shred -u /tmp/nouvelle.json          # puis supprimer l'ancienne clé : gcloud i
 
 Renouveler les clés VAPID oblige chaque téléphone à se réabonner (la clé publique change dans `push.js`).
 
+## Restaurer la progression
+
+Voir le [guide parent](GUIDE-PARENT.md) : téléchargement du fichier sur le tableau de bord, puis « Restaurer » dans l'application. En dernier recours, le fichier `sauvegardes/derniere-sauvegarde.json` du dépôt privé a le même format.
+
+## Tester l'envoi en local
+
+Sur `localhost` l'application n'envoie **rien** (événements, sauvegarde, notifications), pour ne pas mélanger des données d'essai à la base réelle. Pour tester volontairement : `http://localhost:8123/index.html?sync=1`, puis supprimer les données d'essai (`firebase firestore:delete /events --recursive …`, après avoir vérifié qu'aucun vrai profil n'y figure).
+
 ## Dépannage
 
 | Symptôme | Cause probable | Action |
@@ -82,10 +90,10 @@ Renouveler les clés VAPID oblige chaque téléphone à se réabonner (la clé p
 | Connexion Google refusée | Compte non autorisé par les règles | Utiliser le compte parent défini dans `firestore.rules` |
 | Pas de notification | Permission refusée, économie de batterie, appli non installée | Réglages du téléphone ; tester avec `force=true` |
 | Le bilan du lundi n'arrive pas | Notifications GitHub désactivées, ou dépôt sans activité depuis 60 jours | Consulter l'onglet *Issues* et *Actions* |
-| La progression a disparu | Données du site effacées | Restaurer le fichier de sauvegarde |
+| La progression a disparu | Données du site effacées | Télécharger la sauvegarde automatique sur le tableau de bord, puis « Restaurer » |
 
 ## Sauvegardes
 
-- **Progression de l'élève** : bouton « Sauvegarder » (fichier JSON) ; à faire régulièrement.
+- **Progression de l'élève** : sauvegarde automatique dans Firebase (collection `backups`) + copie hebdomadaire dans le dépôt privé ; le bouton « Sauvegarder » reste disponible.
 - **Code** : historique Git du dépôt public.
 - **Suivi parent et tâches** : voir leur README ; aucun export automatique des données Firestore n'est configuré.

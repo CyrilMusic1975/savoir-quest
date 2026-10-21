@@ -428,6 +428,7 @@ function endGame() {
     const records = P.updateRecords(p, { score: gained, maxStreak: game.maxStreak, goalDiff: isMatch ? Math.max(0, game.correct - game.against) : 0 });
     S.saveProfiles();
     S.clearSession(p.id);
+    Sync.backup(S.getProfiles(), true);
 
     show('end');
     $('final-score').textContent = gained;
@@ -556,6 +557,10 @@ $('reminder-settings-btn').addEventListener('click', () => activateReminder($('r
 $('reminder-later').addEventListener('click', () => { try { localStorage.setItem('sq_reminder_dismissed', '1'); } catch (e) { /* ignoré */ } updateReminderUI(); });
 // le rappel mentionne le prénom du profil actif : on met l'abonnement à jour quand on change de profil
 updateReminderUI();
+
+// ---------- Sauvegarde automatique ----------
+setTimeout(() => Sync.backup(S.getProfiles()), 6000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') Sync.backup(S.getProfiles()); });
 
 // ---------- PWA : hors ligne + stockage durable ----------
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

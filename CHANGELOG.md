@@ -2,6 +2,13 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v18 — Sauvegarde automatique de la progression
+- La progression est sauvegardée automatiquement dans Firebase (collection `backups`, un document par installation) après chaque mission, à l'ouverture et à la mise en arrière-plan.
+- Tableau de bord : section « Sauvegardes automatiques » avec téléchargement du fichier, restaurable par le bouton « Restaurer » de l'application.
+- Le bilan hebdomadaire archive une copie de la dernière sauvegarde dans le dépôt privé.
+- Règles Firestore : une installation ne peut écrire que sa propre sauvegarde ; `check-rules.mjs` vérifie désormais 15 refus.
+- Sur `localhost`, l'application n'envoie plus rien (`?sync=1` pour forcer) afin que les essais ne polluent pas la base.
+
 ## v17 — Précision sur le point géométrique
 - L'affirmation « un point est infiniment petit » précise qu'on parle du point géométrique ; l'explication distingue le point (idée) de sa représentation (croix, point de crayon).
 

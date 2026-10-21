@@ -96,6 +96,8 @@ La constante `VERSION` de `sw.js` doit être **changée à chaque publication** 
 - Connexion **anonyme** automatique (API REST d'identité), sans code ni compte.
 - Chaque réponse ajoute un événement à une file locale (3 000 au plus). Envoi par lots de 100, toutes les 3 s après une réponse, au retour du réseau et à la mise en arrière-plan.
 - Événement : prénom du profil, compétence, matière, identifiant de question, cas précis, juste ou faux, date, temps de réponse, et pour une erreur la question et les réponses.
+- **Sauvegarde automatique** (`backup`) : un instantané des profils est enregistré dans `backups/<identifiant de l'installation>` après chaque mission, à l'ouverture et à la mise en arrière-plan (au plus toutes les 5 minutes, et seulement si la progression a changé). Le parent le télécharge depuis le tableau de bord ; l'élève le restaure avec « Restaurer ». Le bilan hebdomadaire en archive aussi une copie dans le dépôt privé.
+- **Développement** : sur `localhost`, rien n'est envoyé (événements, sauvegarde, abonnement) afin que les essais ne polluent pas la base réelle ; `?sync=1` dans l'adresse force l'envoi.
 - Le tableau de bord et les tâches planifiées sont décrits dans [DEPLOIEMENT.md](DEPLOIEMENT.md).
 
 ## Choix de conception
@@ -107,7 +109,7 @@ La constante `VERSION` de `sw.js` doit être **changée à chaque publication** 
 
 ## Limites connues
 
-- **Sauvegarde** : la progression n'existe que dans le navigateur. Si Chrome efface les données du site, elle est perdue, sauf export manuel (bouton « Sauvegarder »). Firebase ne conserve que les événements, pas l'état d'un profil.
+- **Restauration non automatique** : la sauvegarde est automatique, mais après un effacement du téléphone rien ne permet d'identifier l'installation sans compte ni code ; le parent télécharge donc le fichier depuis le tableau de bord et l'élève le restaure à la main. Les sauvegardes d'anciennes installations restent listées (10 plus récentes).
 - **Pas de test automatique dans un vrai navigateur** : l'interface a été vérifiée en émulation mobile, par un parcours scripté, pas par une suite de tests.
 - **Appareil réel** : l'appli n'a pas été éprouvée sur de nombreux modèles de téléphone ; les notifications dépendent des réglages d'économie de batterie du constructeur.
 - **Accessibilité** : annonces `aria-live`, boutons larges et contrastes renforcés, mais aucun audit complet (lecteur d'écran, navigation clavier).

@@ -57,10 +57,15 @@ Ces documents restent sur l'ordinateur ; ils ne sont **jamais publiés**. Les qu
 
 ## Sauvegarder la progression
 
-La progression est stockée dans le téléphone. Pour ne rien perdre :
+La progression est enregistrée **automatiquement** après chaque mission (avec du réseau). Rien à faire au quotidien.
 
-- Dans **Réglages et sauvegarde**, toucher **Sauvegarder** de temps en temps (un fichier est téléchargé). **Restaurer** le réimporte, par exemple sur un nouveau téléphone.
-- Ne pas effacer les « données du site » dans Chrome sans avoir sauvegardé.
+**Si le téléphone est réinitialisé ou si les données de Chrome sont effacées**, la progression se restaure ainsi :
+
+1. Sur le tableau de bord, section **Sauvegardes automatiques**, toucher **Télécharger** à côté de la sauvegarde la plus récente (un fichier est téléchargé).
+2. Envoyer ce fichier sur le téléphone de l'enfant.
+3. Dans l'application : **Réglages et sauvegarde → Restaurer**, puis choisir le fichier. Les profils, points, badges et cartes reviennent.
+
+Une copie supplémentaire de la dernière sauvegarde est archivée chaque lundi dans le dépôt privé (`sauvegardes/derniere-sauvegarde.json`) : elle sert de secours si le projet Firebase disparaissait. Le bouton **Sauvegarder** des réglages reste utile pour exporter un fichier à la main.
 
 ## Questions fréquentes
 
@@ -72,4 +77,6 @@ La progression est stockée dans le téléphone. Pour ne rien perdre :
 
 **Mon enfant peut-il arrêter le suivi ?** Les résultats sont envoyés automatiquement ; l'application l'indique dans ses réglages. Pour tout effacer ou supprimer, voir [DONNEES-ET-CONFIDENTIALITE.md](DONNEES-ET-CONFIDENTIALITE.md).
 
-**Qu'est-ce qui est envoyé exactement ?** Le prénom du profil, la matière, juste ou faux, la date, le temps de réponse, et en cas d'erreur la question et les réponses. Rien d'autre.
+**Qu'est-ce qui est envoyé exactement ?** Le prénom du profil, la matière, juste ou faux, la date, le temps de réponse, et en cas d'erreur la question et les réponses. S'y ajoute la sauvegarde automatique de la progression (points, badges, erreurs à revoir…). Rien d'autre.
+
+**Ma sauvegarde ne s'affiche pas sur le tableau de bord.** Il faut qu'une mission ait été jouée avec du réseau, avec l'application en v18 ou plus.

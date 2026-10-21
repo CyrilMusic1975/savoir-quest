@@ -23,6 +23,10 @@ Toute la progression (profils, points, badges, erreurs, séance en cours) est st
 
 Ne sont **jamais** envoyés : nom de famille, adresse, photo, localisation, identifiant publicitaire. Aucun outil de mesure d'audience, aucun cookie tiers, aucune police externe.
 
+### Sauvegarde automatique de la progression
+
+Pour ne pas perdre la progression si le téléphone est réinitialisé, l'application enregistre aussi, **automatiquement**, un instantané de tous les profils (points, badges, erreurs à revoir, historique de matchs, saisons…) dans la collection `backups`, sous l'identifiant anonyme de l'installation. Ce contenu est plus complet que les événements : il contient les données du profil telles qu'elles sont dans le téléphone. Un seul document par installation, remplacé à chaque sauvegarde.
+
 Si les notifications sont activées, l'abonnement du navigateur (adresse du service de notification et clés publiques) et le prénom du profil sont enregistrés dans la collection `push`, pour envoyer le rappel de 17 h 30.
 
 L'enfant est informé dans l'application : le panneau « Réglages et sauvegarde » indique ce que voient ses parents.
@@ -31,7 +35,7 @@ L'enfant est informé dans l'application : le panneau « Réglages et sauvegarde
 
 | Acteur | Droits |
 |---|---|
-| Application de l'enfant (connexion anonyme) | **Écrire** des événements bien formés ; enregistrer son abonnement. Ne peut rien lire, modifier ni supprimer |
+| Application de l'enfant (connexion anonyme) | **Écrire** des événements bien formés ; enregistrer son abonnement ; **remplacer sa propre sauvegarde** (jamais celle d'une autre installation). Ne peut rien lire ni supprimer |
 | Parent (connexion Google, un seul compte autorisé par les règles) | Lire et supprimer les événements et abonnements |
 | Tâches planifiées (compte de service) | **Lecture seule** de la base |
 | Toute autre personne | Aucun accès |
@@ -42,14 +46,15 @@ Les règles de sécurité (`firestore.rules`, dans le dossier du suivi parent) i
 
 ## Où sont conservés les bilans
 
-Le bilan hebdomadaire (prénom, statistiques, dernières erreurs) est enregistré dans un **dépôt GitHub privé**. La clé d'accès en lecture seule à la base est un secret chiffré de ce dépôt.
+Le bilan hebdomadaire (prénom, statistiques, dernières erreurs) est enregistré dans un **dépôt GitHub privé**, avec une copie de la dernière sauvegarde de progression (`sauvegardes/derniere-sauvegarde.json`, profils fusionnés). La clé d'accès en lecture seule à la base est un secret chiffré de ce dépôt.
 
 ## Conservation et suppression
 
 - Les événements ne sont **pas purgés automatiquement** (aucune durée de conservation n'est programmée).
 - Pour tout effacer : `firebase firestore:delete /events --recursive --force --project savoir-quest-suivi` (et de même pour `/push`), ou depuis la console Firebase.
 - Pour arrêter l'envoi : désinstaller l'application ou effacer les données du site dans le navigateur ; le jeu continue de fonctionner sans le suivi tant qu'aucune connexion n'est possible.
-- Pour supprimer les bilans : supprimer les fichiers du dossier `bilans/` du dépôt privé.
+- Pour supprimer les sauvegardes : `firebase firestore:delete /backups --recursive --force --project savoir-quest-suivi`.
+- Pour supprimer les bilans et les copies de sauvegarde : supprimer `bilans/` et `sauvegardes/` du dépôt privé (l'historique Git en garde la trace : le dépôt entier doit être supprimé pour un effacement définitif).
 - Pour tout supprimer définitivement : supprimer le projet Firebase et le dépôt privé.
 
 ## Contenu d'élève et droits d'auteur

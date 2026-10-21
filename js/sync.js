@@ -5,6 +5,10 @@ const KEY = 'sq_sync';
 const MAX_QUEUE = 3000;
 const DOCS = `https://firestore.googleapis.com/v1/projects/${CFG.projectId}/databases/(default)/documents`;
 
+// En développement (localhost), rien n'est envoyé : les essais ne doivent pas polluer la vraie base.
+// Ajouter ?sync=1 à l'adresse pour tester volontairement l'envoi.
+const DEV = ['localhost', '127.0.0.1'].includes(location.hostname) && !location.search.includes('sync=1');
+
 let state = load();
 let flushing = false;
 let timer = null;
@@ -30,7 +34,7 @@ async function token() {
         });
         if (res.ok) {
             const j = await res.json();
-            state.idToken = j.id_token; state.refreshToken = j.refresh_token;
+            state.idToken = j.id_token; state.refreshToken = j.refresh_token; state.uid = j.user_id;
             state.exp = Date.now() + Number(j.expires_in) * 1000;
             save();
             return state.idToken;
@@ -41,7 +45,7 @@ async function token() {
     });
     if (!res.ok) throw new Error('auth');
     const j = await res.json();
-    state.idToken = j.idToken; state.refreshToken = j.refreshToken;
+    state.idToken = j.idToken; state.refreshToken = j.refreshToken; state.uid = j.localId;
     state.exp = Date.now() + Number(j.expiresIn) * 1000;
     save();
     return state.idToken;
@@ -50,6 +54,7 @@ async function token() {
 const str = v => ({ stringValue: String(v) });
 
 export function logEvent(ev) {
+    if (DEV) return;
     state.queue.push({ ...ev, ts: Date.now() });
     if (state.queue.length > MAX_QUEUE) state.queue.splice(0, state.queue.length - MAX_QUEUE);
     save();
@@ -78,8 +83,46 @@ function toWrite(ev) {
     return { update: { name: `projects/${CFG.projectId}/databases/(default)/documents/events/${id}`, fields }, currentDocument: { exists: false } };
 }
 
+// ---------- Sauvegarde automatique de la progression ----------
+// Un instantané des profils est enregistré sous l'identifiant de cette installation. Le parent peut le télécharger
+// depuis le tableau de bord, puis l'élève le restaure avec le bouton « Restaurer » des réglages.
+const BACKUP_MAX_CHARS = 750000;
+const BACKUP_MIN_INTERVAL = 5 * 60 * 1000;
+let lastBackupTry = 0;
+
+function hashString(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return `${str.length}:${h}`;
+}
+
+// Retourne true si une sauvegarde vient d'être enregistrée. `force` ignore le délai minimal (fin de mission).
+export async function backup(profiles, force = false) {
+    if (DEV) return false;
+    try {
+        if (!profiles.length || !navigator.onLine) return false;
+        const data = JSON.stringify(profiles);
+        if (data.length > BACKUP_MAX_CHARS) return false;
+        const hash = hashString(data);
+        if (hash === state.backupHash) return false; // rien n'a changé depuis la dernière sauvegarde
+        if (!force && Date.now() - lastBackupTry < BACKUP_MIN_INTERVAL) return false;
+        lastBackupTry = Date.now();
+        const idToken = await token();
+        const summary = JSON.stringify(profiles.map(p => ({ n: String(p.name).slice(0, 20), xp: p.totalXP || 0 }))).slice(0, 500);
+        const res = await fetch(`${DOCS}/backups/${state.uid}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+            body: JSON.stringify({ fields: { data: str(data), summary: str(summary), ts: { integerValue: String(Date.now()) } } })
+        });
+        if (res.ok) { state.backupHash = hash; save(); return true; }
+        if (res.status === 401) { state.idToken = null; save(); }
+    } catch (e) { /* hors ligne : on réessaiera */ }
+    return false;
+}
+
 // Écrit (ou remplace) un document de la collection indiquée
 export async function putDoc(path, fields) {
+    if (DEV) return false;
     const idToken = await token();
     const res = await fetch(`${DOCS}/${path}`, {
         method: 'PATCH',
@@ -90,7 +133,7 @@ export async function putDoc(path, fields) {
 }
 
 export async function flush() {
-    if (flushing || !state.queue.length || !navigator.onLine) return;
+    if (DEV || flushing || !state.queue.length || !navigator.onLine) return;
     flushing = true;
     try {
         const idToken = await token();

@@ -28,6 +28,9 @@ python3 -m http.server 8123   # serveur local (les modules JS ne marchent pas en
 - `mc(...)` (QCM généré) ne comble pas les mauvaises réponses manquantes : les tests de générateurs le signalent (« il manque une mauvaise réponse »).
 - Les événements envoyés à Firestore sont soumis à des règles strictes (`firestore.rules` du dossier `SavoirQuest-suivi`) : un nouveau champ d'événement doit être ajouté **aux règles**, à `js/sync.js` et au tableau de bord.
 
+- Sur `localhost`, `js/sync.js` n'envoie **rien** (sauf `?sync=1`) : ne pas s'en étonner en testant. Si tu testes l'envoi, **supprime ensuite tes données d'essai** de Firestore (`events`, `backups`, `push`), après avoir vérifié qu'aucun vrai profil n'y figure.
+- La sauvegarde (`backups`) est limitée à 750 000 caractères côté application et 800 000 côté règles ; si les profils grossissent, élaguer `missed`, `matches` ou `srs` dans `ensureProfile`.
+
 ## Éléments hors de ce dépôt
 
 - `~/Desktop/SavoirQuest-suivi` : règles Firestore, tableau de bord parent, hébergement Firebase (projet `savoir-quest-suivi`). Toujours passer `--project savoir-quest-suivi` aux commandes `firebase`.
