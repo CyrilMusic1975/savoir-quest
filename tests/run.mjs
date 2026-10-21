@@ -1,12 +1,13 @@
 import { run as content } from './content.test.mjs';
 import { run as generators } from './generators.test.mjs';
 import { run as generators6e } from './generators6e.test.mjs';
+import { run as conjugaison } from './conjugaison.test.mjs';
 import { run as engine } from './engine.test.mjs';
 import { run as progress } from './progress.test.mjs';
 
 let failures = 0;
 const MAX_SHOWN = Number(process.env.SHOW) || 10;
-for (const [name, fn] of [['contenu', content], ['générateurs', generators], ['générateurs 6e', generators6e], ['moteur', engine], ['compétition', progress]]) {
+for (const [name, fn] of [['contenu', content], ['générateurs', generators], ['générateurs 6e', generators6e], ['conjugaison', conjugaison], ['moteur', engine], ['compétition', progress]]) {
     const errs = [];
     const info = fn(msg => errs.push(msg));
     if (errs.length) {

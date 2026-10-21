@@ -1,6 +1,6 @@
 import { SUBJECTS, SKILLS, SKILL_BY_ID, QUESTION_BY_ID } from './content/index.js';
 import { ctx } from './content/maths.js';
-import { shuffle, pick } from './content/helpers.js';
+import { shuffle, pick, focus } from './content/helpers.js';
 import { today, addDays } from './state.js';
 
 export const SESSION_SIZE = 10;
@@ -102,7 +102,7 @@ function weakFacets(profile) {
 
 export function buildSession(profile, mode, subject) {
     ctx.mastery = profile.mastery;
-    ctx.weak = weakFacets(profile);
+    ctx.weak = focus.weak = weakFacets(profile);
     const qs = [];
     const used = new Set();
     const add = q => {

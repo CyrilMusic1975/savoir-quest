@@ -1,10 +1,10 @@
 // Incrémenter VERSION à chaque publication pour forcer la mise à jour du cache
-const VERSION = 'sq-v14';
+const VERSION = 'sq-v15';
 const FILES = [
     './', 'index.html', 'style.css', 'manifest.webmanifest',
     'js/main.js', 'js/sync.js', 'js/push.js', 'js/progress.js', 'js/state.js', 'js/engine.js', 'js/render.js',
     'js/content/index.js', 'js/content/helpers.js', 'js/content/maths.js', 'js/content/francais.js',
-    'js/content/sciences.js', 'js/content/histgeo.js', 'js/content/maths6e.js', 'js/content/sciences6e.js', 'js/content/histgeo6e.js', 'js/content/anglais.js',
+    'js/content/sciences.js', 'js/content/histgeo.js', 'js/content/maths6e.js', 'js/content/sciences6e.js', 'js/content/histgeo6e.js', 'js/content/anglais.js', 'js/content/conjugaison.js',
     'icons/icon-192.png', 'icons/icon-512.png'
 ];
 

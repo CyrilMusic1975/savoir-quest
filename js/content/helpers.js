@@ -8,6 +8,12 @@ export function shuffle(a) {
 }
 export const pick = a => a[Math.floor(Math.random() * a.length)];
 export const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+// Cas précis que l'élève rate (renseigné par le moteur avant chaque séance) : on les propose plus souvent
+export const focus = { weak: {} };
+export function weakFacet(skillId) {
+    const list = focus.weak[skillId];
+    return list && list.length && Math.random() < 0.5 ? list[Math.floor(Math.random() * list.length)] : null;
+}
 export const fmtNum = n => String(n).replace('.', ',');
 
 export function generateOptions(correct, isNumeric, customGen = null) {

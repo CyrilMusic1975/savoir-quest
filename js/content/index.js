@@ -1,6 +1,7 @@
 import { mathsSkills } from './maths.js';
 import { maths6eSkills } from './maths6e.js';
 import { francaisSkills } from './francais.js';
+import { conjugaisonSkills } from './conjugaison.js';
 import { sciencesSkills } from './sciences.js';
 import { histgeoSkills } from './histgeo.js';
 import { sciences6eSkills } from './sciences6e.js';
@@ -19,7 +20,7 @@ export const SUBJECTS = [
 // Contenus déjà vus en classe (cours déposés) en premier ; le reste est du contenu général de 6e, proposé moins souvent
 const EXTRA = new Set(['svt_vivant', 'svt_alimentation', 'svt_plantes', 'pc_etats', 'pc_melanges', 'pc_lumiere', 'hg_prehistoire', 'hg_antiquite1', 'hg_grecerome', 'hg_geo', 'hg_mots',
     'math_priorites', 'math_division', 'math_geometrie', 'math_pourcentages', 'math_durees', 'math_multiples', 'math_divisibilite']);
-export const SKILLS = [...mathsSkills, ...maths6eSkills, ...francaisSkills, ...sciencesSkills, ...sciences6eSkills, ...histgeoSkills, ...histgeo6eSkills, ...anglaisSkills]
+export const SKILLS = [...mathsSkills, ...maths6eSkills, ...francaisSkills, ...conjugaisonSkills, ...sciencesSkills, ...sciences6eSkills, ...histgeoSkills, ...histgeo6eSkills, ...anglaisSkills]
     .map(s => (EXTRA.has(s.id) ? { ...s, extra: true } : s));
 export const SKILL_BY_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 
