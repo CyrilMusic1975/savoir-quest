@@ -258,14 +258,14 @@ p {
     height: 48px;
     flex: 1 1 0;
     max-width: 44px;
-    border: 3px solid #cbd5e1;
-    background: rgba(255, 255, 255, 0.12);
+    border: 3px dashed #e2e8f0;
+    background: rgba(255, 255, 255, 0.28);
     border-radius: 6px;
 }
 
 .bar-segment.filled {
     background: linear-gradient(180deg, var(--accent), var(--primary-light));
-    border-color: #ffffff;
+    border: 3px solid #ffffff;
 }
 
 /* Animations */
@@ -599,3 +599,5 @@ p {
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+.version { margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-muted); opacity: 0.7; }
