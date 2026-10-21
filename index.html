@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Savoir Quest : révisions de 6e en petites missions">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Savoir Quest : L'Odyssée des Connaissances</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="starfield"></div>
+    <div class="container">
+        <!-- Écran d'Accueil -->
+        <div id="home-screen" class="screen">
+            <div class="animate-pop">
+                <h1>Savoir Quest</h1>
+                <p>Prêt pour l'Odyssée des Connaissances ? Révise tes maths et ta grammaire !</p>
+
+                <div id="profile-selection-area" class="mb-2">
+                    <h2 class="section-title">Choisis ton profil</h2>
+                    <div id="profiles-grid" class="profiles-grid">
+                        <!-- Profils injectés ici -->
+                    </div>
+                    <button id="add-profile-btn" class="btn btn-secondary mt-1">+ NOUVEAU PROFIL</button>
+                </div>
+
+                <div id="active-profile-info" class="hidden mb-2">
+                    <div id="total-xp-display" class="xp-pill">
+                        Total XP : 0
+                    </div>
+                </div>
+
+                <div class="options-grid home-actions">
+                    <button id="start-btn" class="btn btn-primary hidden">COMMENCER L'AVENTURE</button>
+                    <button id="switch-profile-btn" class="btn btn-secondary hidden">CHANGER DE PROFIL</button>
+                </div>
+
+                <details class="backup">
+                    <summary>💾 Sauvegarde de ma progression</summary>
+                    <p>Télécharge un fichier pour ne jamais perdre tes points, ou restaure-le sur un autre appareil.</p>
+                    <div class="backup-actions">
+                        <button id="export-btn" class="btn btn-secondary">Sauvegarder</button>
+                        <button id="import-btn" class="btn btn-secondary">Restaurer</button>
+                    </div>
+                    <input type="file" id="import-input" accept="application/json,.json" hidden>
+                    <div id="backup-status" class="backup-status" role="status"></div>
+                </details>
+            </div>
+        </div>
+
+        <!-- Zone de Jeu -->
+        <div id="game-screen" class="screen hidden">
+            <div class="stats-bar">
+                <span id="score-display">Score: 0</span>
+                <span id="level-title">Mission : ...</span>
+                <span id="timer-display">Temps: 00s</span>
+            </div>
+
+            <div id="streak-badge" class="streak-badge" aria-live="polite">COMBO x2 🔥</div>
+
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <div class="question-card">
+                <div id="visual-area"></div>
+                <div id="question-text" class="question-text">Préparation de la mission...</div>
+            </div>
+
+            <div id="options-container" class="options-grid" role="group" aria-label="Réponses">
+                <!-- Les boutons d'options seront insérés ici par JS -->
+            </div>
+
+            <!-- Boîte d'explication pédagogique -->
+            <div id="explanation-box" class="explanation-box hidden">
+                <div class="explanation-header">💡 Explication</div>
+                <div id="explanation-text" class="explanation-text">L'explication viendra ici...</div>
+                <button id="continue-btn" class="btn btn-primary btn-block">J'AI COMPRIS, ON CONTINUE !</button>
+            </div>
+        </div>
+
+        <!-- Écran de Fin -->
+        <div id="end-screen" class="screen hidden">
+            <div class="animate-pop">
+                <h1 id="end-title">Félicitations !</h1>
+                <p id="end-message">Tu as terminé ta mission avec brio.</p>
+                <div class="question-card">
+                    <div class="final-score" id="final-score">0</div>
+                    <div class="muted">Points d'expérience gagnés</div>
+                </div>
+                <button id="restart-btn" class="btn btn-primary mt-2">RECOMMENCER</button>
+            </div>
+        </div>
+
+    </div> <!-- end container -->
+
+    <div id="feedback" role="status" aria-live="polite"></div>
+
+    <!-- Modal Création Profil -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content animate-pop">
+            <h2>Nouveau Profil</h2>
+            <p>Entre ton nom pour commencer ton odyssée !</p>
+            <input type="text" id="profile-name-input" autocomplete="off" enterkeyhint="done" placeholder="Ton nom..." maxlength="15">
+            <div class="modal-actions">
+                <button id="cancel-profile-btn" class="btn btn-secondary">Annuler</button>
+                <button id="confirm-profile-btn" class="btn btn-primary">C'est parti !</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
