@@ -1,11 +1,11 @@
-import { SUBJECTS } from './content/index.js';
+import { SUBJECTS, SKILLS } from './content/index.js';
 import * as S from './state.js';
-import { buildSession, recordAnswer, completeSession, countToReview, countDue, currentStreak, doneToday } from './engine.js';
+import { buildSession, recordAnswer, completeSession, countToReview, countDue, currentStreak, doneToday, badgeProgress, TIERS } from './engine.js';
 import { renderQuestion } from './render.js';
 import * as Sync from './sync.js';
 
 const $ = id => document.getElementById(id);
-const screens = { home: $('home-screen'), subjects: $('subject-screen'), game: $('game-screen'), end: $('end-screen') };
+const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), game: $('game-screen'), end: $('end-screen') };
 const questionText = $('question-text');
 const optionsBox = $('options-container');
 const visualArea = $('visual-area');
@@ -124,7 +124,7 @@ function updateHome() {
     const loggedIn = !!p;
     $('profile-selection-area').classList.toggle('hidden', loggedIn);
     $('active-profile-info').classList.toggle('hidden', !loggedIn);
-    ['daily-btn', 'subjects-btn', 'switch-profile-btn'].forEach(id => $(id).classList.toggle('hidden', !loggedIn));
+    ['daily-btn', 'subjects-btn', 'badges-btn', 'switch-profile-btn'].forEach(id => $(id).classList.toggle('hidden', !loggedIn));
     if (!p) { $('resume-btn').classList.add('hidden'); $('errors-btn').classList.add('hidden'); return; }
 
     $('total-xp-display').textContent = `${p.name} : ${p.totalXP || 0} XP`;
@@ -173,6 +173,51 @@ function renderSubjects() {
     });
 }
 
+// ---------- Badges ----------
+$('badges-btn').addEventListener('click', () => { renderBadges(); show('badges'); });
+$('badges-back-btn').addEventListener('click', () => show('home'));
+function renderBadges() {
+    const p = S.currentProfile();
+    const root = $('badges-list');
+    root.replaceChildren();
+    let total = 0;
+    SUBJECTS.forEach(sub => {
+        const h = document.createElement('h2');
+        h.className = 'badge-subject';
+        h.textContent = `${sub.emoji} ${sub.label}`;
+        root.appendChild(h);
+        SKILLS.filter(s => s.subject === sub.id).forEach(skill => {
+            const pr = badgeProgress(p, skill.id);
+            if (pr.tier) total++;
+            const row = document.createElement('div');
+            row.className = 'badge-row';
+            const icon = document.createElement('span');
+            icon.className = 'badge-icon';
+            icon.textContent = pr.tier ? TIERS[pr.tier - 1].emoji : '🔒';
+            const info = document.createElement('div');
+            info.className = 'badge-info';
+            const name = document.createElement('div');
+            name.className = 'badge-name';
+            name.textContent = skill.label;
+            const sub2 = document.createElement('div');
+            sub2.className = 'badge-sub';
+            sub2.textContent = pr.next ? `${pr.ok} / ${pr.need} bonnes réponses pour le badge ${pr.next.name}` : 'Badge Or obtenu, bravo !';
+            info.append(name, sub2);
+            if (pr.next) {
+                const bar = document.createElement('div');
+                bar.className = 'badge-bar';
+                const fill = document.createElement('i');
+                fill.style.width = `${Math.min(100, Math.round((pr.ok / pr.need) * 100))}%`;
+                bar.appendChild(fill);
+                info.appendChild(bar);
+            }
+            row.append(icon, info);
+            root.appendChild(row);
+        });
+    });
+    $('badges-total').textContent = `${total} badge${total > 1 ? 's' : ''} sur ${SKILLS.length}`;
+}
+
 // ---------- Séance ----------
 $('daily-btn').addEventListener('click', () => startSession('daily'));
 $('errors-btn').addEventListener('click', () => startSession('errors'));
@@ -191,7 +236,7 @@ function startSession(mode, subject) {
     const questions = buildSession(p, mode, subject);
     S.saveProfiles(); // les erreurs reprises ont quitté le carnet
     if (!questions.length) return;
-    game = { mode, subject, questions, index: 0, score: 0, streak: 0, correct: 0, timer: 0, locked: false };
+    game = { mode, subject, questions, index: 0, score: 0, streak: 0, correct: 0, timer: 0, locked: false, newBadges: [] };
     begin();
 }
 
@@ -199,7 +244,7 @@ function resumeSession() {
     const p = S.currentProfile();
     const saved = p && S.loadSession(p.id);
     if (!saved) return;
-    game = { ...saved, locked: false };
+    game = { newBadges: [], ...saved, locked: false };
     begin();
 }
 
@@ -214,7 +259,7 @@ function persistSession() {
     const p = S.currentProfile();
     if (!p || !game) return;
     if (game.index >= game.questions.length) S.clearSession(p.id);
-    else S.saveSession(p.id, { mode: game.mode, subject: game.subject, questions: game.questions, index: game.index, score: game.score, streak: game.streak, correct: game.correct, timer: game.timer });
+    else S.saveSession(p.id, { mode: game.mode, subject: game.subject, questions: game.questions, index: game.index, score: game.score, streak: game.streak, correct: game.correct, timer: game.timer, newBadges: game.newBadges });
 }
 
 function startTimer() {
@@ -245,6 +290,7 @@ function nextQuestion() {
     }
     progressBar.style.width = `${(game.index / game.questions.length) * 100}%`;
     persistSession();
+    game.qStart = Date.now();
     renderQuestion(q, { visualArea, optionsBox }, onAnswer);
 }
 
@@ -253,8 +299,11 @@ function onAnswer(correct, given) {
     game.locked = true;
     const q = game.questions[game.index];
     const p = S.currentProfile();
-    recordAnswer(p, q, correct);
+    const ms = game.qStart ? Math.min(120000, Date.now() - game.qStart) : undefined;
+    const badge = recordAnswer(p, q, correct, ms);
+    if (badge) game.newBadges.push(badge);
     Sync.logEvent({
+        ms,
         profile: p.name, skill: q.skill || q.generatorId, subject: q.subject, qid: q.id, facet: q.facet, correct,
         given: correct ? undefined : given,
         ans: correct ? undefined : q.answer,
@@ -265,7 +314,7 @@ function onAnswer(correct, given) {
         game.correct++;
         game.streak++;
         game.score += game.streak >= 3 ? 150 : (game.streak >= 2 ? 120 : 100);
-        showFeedback(game.streak >= 3 ? '🔥 INCROYABLE !' : '✨ BIEN JOUÉ !');
+        showFeedback(badge ? `${badge.tier.emoji} BADGE ${badge.tier.name.toUpperCase()} !` : (game.streak >= 3 ? '🔥 INCROYABLE !' : '✨ BIEN JOUÉ !'));
         playSound(440 + game.streak * 50, 'triangle', 0.2);
         scoreDisplay.textContent = `Score: ${game.score}`;
         S.saveProfiles();
@@ -328,6 +377,14 @@ function endGame() {
         daily.textContent = `✅ Mission du jour accomplie — 🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite`;
         endMessage.appendChild(daily);
     }
+    const box = $('end-badges');
+    box.replaceChildren();
+    game.newBadges.forEach(b => {
+        const d = document.createElement('div');
+        d.className = 'new-badge';
+        d.textContent = `${b.tier.emoji} Badge ${b.tier.name} : ${b.label}`;
+        box.appendChild(d);
+    });
     game = null;
     checkPSGMilestones(previousXP, p.totalXP);
 }

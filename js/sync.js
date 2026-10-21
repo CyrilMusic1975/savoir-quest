@@ -65,6 +65,7 @@ function toWrite(ev) {
         correct: { booleanValue: !!ev.correct }, ts: { integerValue: String(ev.ts) }
     };
     if (ev.qid) fields.qid = str(ev.qid);
+    if (typeof ev.ms === 'number' && ev.ms >= 0) fields.ms = { integerValue: String(Math.round(ev.ms)) };
     if (ev.facet) fields.facet = str(String(ev.facet).slice(0, 40));
     if (!ev.correct) {
         if (ev.given) fields.given = str(String(ev.given).slice(0, 200));

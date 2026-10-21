@@ -686,3 +686,15 @@ p {
 #parent-link-form { display: flex; flex-direction: column; gap: 0.6rem; }
 .answer-input.small { font-size: 1.2rem; padding: 0.75rem; letter-spacing: 0.1em; }
 .parent-link .btn { width: 100%; justify-content: center; margin-top: 0.4rem; }
+
+/* Badges */
+.badges-list { text-align: left; }
+.badge-subject { font-size: 1.15rem; margin: 1.25rem 0 0.5rem; color: var(--accent); }
+.badge-row { display: grid; grid-template-columns: 2.6rem 1fr; gap: 0.75rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--glass-border); }
+.badge-icon { font-size: 2rem; text-align: center; }
+.badge-name { font-weight: 600; }
+.badge-sub { font-size: 0.85rem; color: var(--text-muted); }
+.badge-bar { height: 6px; background: var(--surface); border-radius: 3px; margin-top: 0.35rem; overflow: hidden; }
+.badge-bar i { display: block; height: 100%; background: linear-gradient(to right, var(--primary), var(--accent)); }
+.end-badges { margin-top: 1rem; }
+.new-badge { margin: 0.5rem 0; padding: 0.75rem 1rem; border-radius: 1rem; background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15)); border: 2px solid var(--streak-gold); color: var(--text); font-weight: 700; }

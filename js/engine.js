@@ -6,6 +6,29 @@ import { today, addDays } from './state.js';
 export const SESSION_SIZE = 10;
 const INTERVALS = [0, 1, 3, 7, 14, 30]; // jours avant la prochaine révision selon la "boîte"
 const MAX_MISSED = 30;
+// Une bonne réponse trop lente est « fragile » : elle compte à moitié pour les facettes et ne fait pas avancer la révision espacée
+const SLOW_MS = { qcm: 15000, input: 30000, tap: 20000, order: 30000, match: 40000 };
+
+// Badges par compétence : paliers sur le nombre de bonnes réponses ET la réussite récente (20 dernières)
+export const TIERS = [
+    { name: 'Bronze', emoji: '🥉', ok: 10, rate: 0.7 },
+    { name: 'Argent', emoji: '🥈', ok: 30, rate: 0.8 },
+    { name: 'Or', emoji: '🥇', ok: 60, rate: 0.9 }
+];
+function tierFor(st) {
+    const last = st.last || [];
+    if (last.length < 10) return 0;
+    const rate = last.reduce((a, b) => a + b, 0) / last.length;
+    let tier = 0;
+    TIERS.forEach((t, i) => { if (st.ok >= t.ok && rate >= t.rate) tier = i + 1; });
+    return tier;
+}
+export function badgeProgress(profile, skillId) {
+    const st = profile.skillStats[skillId] || { ok: 0, last: [] };
+    const tier = profile.badges[skillId] || 0;
+    const next = TIERS[tier] || null;
+    return { tier, ok: st.ok, next, need: next ? next.ok : null };
+}
 
 const skillOf = q => SKILL_BY_ID[q.skill || q.generatorId];
 const subjectOf = q => q.subject || skillOf(q)?.subject;
@@ -125,10 +148,23 @@ export function buildSession(profile, mode, subject) {
     return shuffle(qs);
 }
 
-export function recordAnswer(profile, q, correct) {
+// Retourne un éventuel nouveau badge obtenu grâce à cette réponse
+export function recordAnswer(profile, q, correct, ms) {
     const id = q.skill || q.generatorId;
+    const slow = !!(correct && ms && ms > (SLOW_MS[q.kind || 'qcm'] || 20000));
+    let newBadge = null;
     if (id) {
         profile.mastery[id] = correct ? (profile.mastery[id] || 0) + 1 : Math.max(-10, (profile.mastery[id] || 0) - 2);
+        const stat = (profile.skillStats[id] = profile.skillStats[id] || { ok: 0, total: 0, last: [] });
+        stat.total++;
+        if (correct) stat.ok++;
+        stat.last.push(correct ? 1 : 0);
+        if (stat.last.length > 20) stat.last.shift();
+        const tier = tierFor(stat);
+        if (tier > (profile.badges[id] || 0)) {
+            profile.badges[id] = tier;
+            newBadge = { id, label: SKILL_BY_ID[id]?.label || id, tier: TIERS[tier - 1] };
+        }
         const recent = (profile.recent[id] = profile.recent[id] || []);
         recent.push(correct ? 1 : 0);
         if (recent.length > 10) recent.shift();
@@ -142,7 +178,7 @@ export function recordAnswer(profile, q, correct) {
     if (q.facet && id) {
         const f = ((profile.facets[id] = profile.facets[id] || {})[q.facet] = profile.facets[id][q.facet] || { ok: 0, total: 0 });
         f.total++;
-        if (correct) f.ok++;
+        if (correct) f.ok += slow ? 0.5 : 1;
         // on oublie progressivement les anciens essais pour que la facette puisse se "guérir"
         if (f.total > 12) { f.ok = Math.round(f.ok * 0.75); f.total = Math.round(f.total * 0.75); }
     }
@@ -155,7 +191,10 @@ export function recordAnswer(profile, q, correct) {
     if (q.id) {
         // répétition espacée : une bonne réponse espace la prochaine révision, une erreur la ramène à aujourd'hui
         const e = (profile.srs[q.id] = profile.srs[q.id] || { box: 0, due: today() });
-        if (correct) {
+        if (correct && slow) {
+            e.due = addDays(today(), 1); // réussie mais hésitante : on la revoit demain, sans avancer
+            e.fail = false;
+        } else if (correct) {
             e.box = Math.min(5, e.box + 1);
             e.due = addDays(today(), INTERVALS[e.box]);
             e.fail = false;
@@ -174,6 +213,7 @@ export function recordAnswer(profile, q, correct) {
         profile.mastery[`${a}x${b}`] = (profile.mastery[`${a}x${b}`] || 0) + 1;
         profile.mastery[`${b}x${a}`] = (profile.mastery[`${b}x${a}`] || 0) + 1;
     }
+    return newBadge;
 }
 
 // Appelé à la fin d'une séance : met à jour la série de jours consécutifs

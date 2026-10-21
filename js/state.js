@@ -21,6 +21,8 @@ export function ensureProfile(p) {
     p.levels = p.levels || {};
     p.stats = p.stats || {};
     p.facets = p.facets || {};
+    p.skillStats = p.skillStats || {};
+    p.badges = p.badges || {};
     p.daily = p.daily || { streak: 0, last: null };
     p.schemaVersion = 2;
     return p;

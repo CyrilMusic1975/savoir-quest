@@ -37,6 +37,7 @@
                     <button id="resume-btn" class="btn btn-secondary hidden">▶ REPRENDRE MA MISSION</button>
                     <button id="daily-btn" class="btn btn-primary hidden">⭐ MISSION DU JOUR</button>
                     <button id="subjects-btn" class="btn btn-secondary hidden">📚 CHOISIR UNE MATIÈRE</button>
+                    <button id="badges-btn" class="btn btn-secondary hidden">🏅 MES BADGES</button>
                     <button id="errors-btn" class="btn btn-secondary hidden">🔁 MES ERREURS</button>
                     <button id="switch-profile-btn" class="btn btn-secondary hidden">CHANGER DE PROFIL</button>
                 </div>
@@ -57,7 +58,7 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v10</div>
+                <div class="version">v11</div>
             </div>
         </div>
 
@@ -69,6 +70,14 @@
                 <div id="subjects-grid" class="subjects-grid"></div>
                 <button id="subjects-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
             </div>
+        </div>
+
+        <!-- Badges -->
+        <div id="badges-screen" class="screen hidden">
+            <h1>Mes badges</h1>
+            <p id="badges-total"></p>
+            <div id="badges-list" class="badges-list"></div>
+            <button id="badges-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
         </div>
 
         <!-- Zone de Jeu -->
@@ -109,6 +118,7 @@
                     <div class="final-score" id="final-score">0</div>
                     <div class="muted">Points d'expérience gagnés</div>
                 </div>
+                <div id="end-badges" class="end-badges"></div>
                 <button id="restart-btn" class="btn btn-primary mt-2">REVENIR À L'ACCUEIL</button>
             </div>
         </div>
