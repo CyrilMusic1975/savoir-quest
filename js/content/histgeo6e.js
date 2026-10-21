@@ -114,8 +114,10 @@ const candi = [
 
 const espace = [
     qcm('hg_es01', 'Où est toujours le nord sur une carte ?', 'En haut', ['En bas', 'À gauche', 'À droite'], 'Le nord est toujours en haut : sur une carte, on trouve toujours au moins l\'indication du nord.'),
-    qcm('hg_es02', 'Avec le mot ORANGE, où se trouve l\'ouest ?', 'À gauche (la lettre O)', ['À droite (la lettre E)', 'En haut', 'En bas'], 'ORANGE : le O de ouest est à gauche, le E de est est à droite.'),
-    qcm('hg_es03', 'Avec le mot ORANGE, où se trouve l\'est ?', 'À droite (la lettre E)', ['À gauche (la lettre O)', 'En haut', 'En bas'], 'Le E de « orangE » est à droite : c\'est l\'est.'),
+    qcm('hg_es02', 'Astuce : on écrit le mot ORANGE de gauche à droite sur la carte. La première lettre, le O, indique…', 'l\'ouest, à gauche', ['l\'est, à droite', 'le nord, en haut', 'le sud, en bas'], 'ORANGE : le O du début est le O d\'Ouest (à gauche) et le E de la fin est le E d\'Est (à droite). Le nord est toujours en haut.'),
+    qcm('hg_es03', 'Astuce : on écrit le mot ORANGE de gauche à droite sur la carte. La dernière lettre, le E, indique…', 'l\'est, à droite', ['l\'ouest, à gauche', 'le nord, en haut', 'le sud, en bas'], 'ORANGE : le O du début est le O d\'Ouest (à gauche) et le E de la fin est le E d\'Est (à droite).'),
+    qcm('hg_es02b', 'Sur une carte, le nord est en haut. De quel côté se trouve l\'ouest ?', 'À gauche', ['À droite', 'En haut', 'En bas'], 'Pour t\'aider : écris ORANGE de gauche à droite. Le O (ouest) est à gauche, le E (est) est à droite.'),
+    qcm('hg_es03b', 'Sur une carte, le nord est en haut. De quel côté se trouve l\'est ?', 'À droite', ['À gauche', 'En haut', 'En bas'], 'Pour t\'aider : écris ORANGE de gauche à droite. Le O (ouest) est à gauche, le E (est) est à droite.'),
     match('hg_es04', 'Associe chaque abréviation à son point cardinal.', [['NO', 'nord-ouest'], ['NE', 'nord-est'], ['SO', 'sud-ouest'], ['SE', 'sud-est']], 'Les points cardinaux : nord, sud, est, ouest et leurs combinaisons.', 2),
     qcm('hg_es05', 'Quelle ligne imaginaire coupe le globe en deux hémisphères (nord et sud) ?', 'L\'équateur', ['Le méridien de Greenwich', 'Le tropique du Cancer', 'Le cercle polaire arctique'], 'L\'équateur est le parallèle qui coupe le globe en hémisphère nord et hémisphère sud.'),
     qcm('hg_es06', 'Les parallèles sont des lignes imaginaires…', 'horizontales', ['verticales', 'obliques', 'en spirale'], 'Les parallèles découpent le globe en tranches horizontales.'),
