@@ -56,6 +56,7 @@ Les modules JavaScript ne fonctionnent pas en ouvrant `index.html` directement d
 
 | Document | Contenu |
 |---|---|
+| [docs/GUIDE-PARENT.md](docs/GUIDE-PARENT.md) | Utilisation au quotidien, lecture du bilan, fourniture de cours (sans jargon) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Fonctionnement interne, modèle de données, algorithmes, limites connues |
 | [docs/CONTENU.md](docs/CONTENU.md) | Comment ajouter des questions, des générateurs et une matière |
 | [docs/TESTS.md](docs/TESTS.md) | Ce que vérifient les contrôles automatiques |
