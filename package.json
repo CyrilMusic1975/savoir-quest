@@ -1,6 +1,12 @@
 {
   "name": "savoir-quest",
+  "description": "Application de révision de 6e (PWA, JavaScript pur)",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node tests/run.mjs" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node tests/run.mjs"
+  }
 }
