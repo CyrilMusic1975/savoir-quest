@@ -1,4 +1,4 @@
-import { qcm, tf, order, match, flash } from './helpers.js';
+import { qcm, tf, order, match } from './helpers.js';
 
 // Contenu de départ rédigé d'après le programme de 6e : à ajuster avec les leçons réelles.
 
@@ -40,15 +40,21 @@ const geo = [
     qcm('hg_geo07', 'Quel est le plus grand océan ?', 'l\'océan Pacifique', ['l\'océan Atlantique', 'l\'océan Indien', 'l\'océan Arctique'], 'Le Pacifique couvre à lui seul près d\'un tiers de la surface de la Terre.'),
     qcm('hg_geo08', 'Le développement durable consiste à…', 'répondre aux besoins d\'aujourd\'hui sans empêcher les générations futures de répondre aux leurs', ['produire le plus possible', 'ne plus utiliser aucune énergie', 'construire des grandes villes'], 'C\'est un développement qui respecte à la fois l\'économie, la société et l\'environnement.', 2)
 ];
-const mots = [
-    flash('hg_f01', 'Néolithique', 'Période où les humains deviennent agriculteurs, éleveurs et sédentaires (vers -10 000).'),
-    flash('hg_f02', 'Sédentaire', 'Qui vit toujours au même endroit.'),
-    flash('hg_f03', 'Pharaon', 'Roi de l\'Égypte ancienne, considéré comme un dieu.'),
-    flash('hg_f04', 'Cité-État', 'Ville indépendante avec son propre gouvernement (ex : Athènes, Sparte).'),
-    flash('hg_f05', 'Démocratie', 'Régime où le pouvoir appartient au peuple (« dêmos » = peuple).'),
-    flash('hg_f06', 'Densité de population', 'Nombre d\'habitants par kilomètre carré.'),
-    flash('hg_f07', 'Littoral', 'Zone de contact entre la terre et la mer.')
+// Mots à retenir : « Que signifie … ? » avec, comme mauvaises réponses, les définitions des autres mots
+const motsData = [
+    ['hg_f01', 'Néolithique', 'Période où les humains deviennent agriculteurs, éleveurs et sédentaires (vers -10 000).'],
+    ['hg_f02', 'Sédentaire', 'Qui vit toujours au même endroit.'],
+    ['hg_f03', 'Pharaon', 'Roi de l\'Égypte ancienne, considéré comme un dieu.'],
+    ['hg_f04', 'Cité-État', 'Ville indépendante avec son propre gouvernement (ex : Athènes, Sparte).'],
+    ['hg_f05', 'Démocratie', 'Régime où le pouvoir appartient au peuple (« dêmos » = peuple).'],
+    ['hg_f06', 'Densité de population', 'Nombre d\'habitants par kilomètre carré.'],
+    ['hg_f07', 'Littoral', 'Zone de contact entre la terre et la mer.']
 ];
+const mots = motsData.map(([id, mot, def], i) => {
+    const wrongs = motsData.filter((_, j) => j !== i).map(m => m[2]);
+    const picked = [wrongs[i % wrongs.length], wrongs[(i + 2) % wrongs.length], wrongs[(i + 4) % wrongs.length]];
+    return qcm(id, `Que signifie « ${mot} » ?`, def, [...new Set(picked)].filter(w => w !== def), `${mot} : ${def}`);
+});
 export const histgeoSkills = [
     { id: 'hg_prehistoire', subject: 'histgeo', label: 'Préhistoire et Néolithique', bank: prehistoire },
     { id: 'hg_antiquite1', subject: 'histgeo', label: 'Mésopotamie et Égypte', bank: antiquite1 },
