@@ -7,6 +7,49 @@ const el = (tag, cls, text) => {
     return e;
 };
 
+// --- Figure de géométrie : points alignés, droite / demi-droite / segment mis en évidence ---
+const SVGNS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, text) {
+    const e = document.createElementNS(SVGNS, tag);
+    Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+    if (text !== undefined) e.textContent = text;
+    return e;
+}
+function drawGeo(v, area) {
+    const W = 320, H = 120, Y = 72, M = 8;
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, class: 'geo-figure', role: 'img', 'aria-label': 'Figure de géométrie' });
+    const px = x => 22 + x * (W - 44);
+    const by = Object.fromEntries(v.points.map(p => [p.l, p]));
+    svg.appendChild(svgEl('line', { x1: M, y1: Y, x2: W - M, y2: Y, class: 'geo-support' }));
+    const arrow = dir => svgEl('polygon', {
+        points: dir > 0 ? `${W - M + 2},${Y} ${W - M - 11},${Y - 7} ${W - M - 11},${Y + 7}` : `${M - 2},${Y} ${M + 11},${Y - 7} ${M + 11},${Y + 7}`,
+        class: 'geo-main-fill'
+    });
+    const tick = x => svgEl('line', { x1: x, y1: Y - 11, x2: x, y2: Y + 11, class: 'geo-main' });
+    const o = v.obj;
+    if (o) {
+        const a = by[o.from], b = o.to ? by[o.to] : null;
+        if (o.type === 'line') {
+            svg.append(svgEl('line', { x1: M, y1: Y, x2: W - M - 6, y2: Y, class: 'geo-main' }), arrow(1), arrow(-1));
+        } else if (o.type === 'segment') {
+            svg.append(svgEl('line', { x1: px(a.x), y1: Y, x2: px(b.x), y2: Y, class: 'geo-main' }), tick(px(a.x)), tick(px(b.x)));
+        } else if (o.type === 'ray') {
+            const dir = b.x > a.x ? 1 : -1;
+            const end = dir > 0 ? W - M - 6 : M + 6;
+            svg.append(svgEl('line', { x1: px(a.x), y1: Y, x2: end, y2: Y, class: 'geo-main' }), tick(px(a.x)), arrow(dir));
+        }
+    }
+    const cross = (x, y) => [
+        svgEl('line', { x1: x - 6, y1: y - 6, x2: x + 6, y2: y + 6, class: 'geo-pt' }),
+        svgEl('line', { x1: x - 6, y1: y + 6, x2: x + 6, y2: y - 6, class: 'geo-pt' })
+    ];
+    v.points.forEach(p => {
+        svg.append(...cross(px(p.x), Y), svgEl('text', { x: px(p.x), y: Y + 30, class: 'geo-label', 'text-anchor': 'middle' }, p.l));
+    });
+    if (v.off) svg.append(...cross(px(v.off.x), 26), svgEl('text', { x: px(v.off.x) + 14, y: 22, class: 'geo-label', 'text-anchor': 'middle' }, v.off.l));
+    area.appendChild(svg);
+}
+
 // --- Visuels (au-dessus de la question) ---
 function renderVisual(q, area) {
     area.innerHTML = '';
@@ -41,6 +84,8 @@ function renderVisual(q, area) {
         table.appendChild(head);
         c.appendChild(table);
         area.appendChild(c);
+    } else if (v.type === 'geo') {
+        drawGeo(v, area);
     } else if (v.type === 'text-display') {
         area.appendChild(el('div', 'text-display', `« ${v.content} »`));
     }
@@ -59,8 +104,9 @@ const sameAnswer = (a, b) => {
 
 // --- Interaction : chaque type appelle submit(correct) une seule fois ---
 function renderQcm(q, box, submit) {
+    const symbolic = q.options.every(o => o.length <= 2); // =, ≠, ∈, ∉ : gros boutons
     q.options.forEach(opt => {
-        const btn = el('button', 'btn btn-option animate-pop', opt);
+        const btn = el('button', `btn btn-option animate-pop${symbolic ? ' btn-symbol' : ''}`, opt);
         btn.onclick = () => {
             box.querySelectorAll('button').forEach(b => { b.disabled = true; });
             const ok = opt === q.answer;

@@ -77,7 +77,7 @@ export function updateRecords(profile, { score, maxStreak, goalDiff }) {
 }
 
 // ---------- Cartes de joueur ----------
-export const POSITIONS = { maths: 'ATT', francais: 'MIL', svt: 'DEF', physique: 'GAR', histgeo: 'CAP' };
+export const POSITIONS = { maths: 'ATT', francais: 'MIL', svt: 'DEF', physique: 'GAR', histgeo: 'CAP', anglais: 'AIL' };
 export function playerCard(profile, skillId) {
     const tier = profile.badges[skillId] || 0;
     const st = profile.skillStats[skillId] || { ok: 0, last: [], ms: 0 };

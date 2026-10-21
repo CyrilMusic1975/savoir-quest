@@ -48,7 +48,7 @@ function cloneBankQuestion(src) {
 }
 
 function weightedSkill(profile, skills) {
-    const weights = skills.map(s => Math.max(1, Math.min(20, 10 - (profile.mastery[s.id] || 0))));
+    const weights = skills.map(s => Math.max(1, Math.min(20, 10 - (profile.mastery[s.id] || 0))) * (s.extra ? 0.25 : 1));
     let r = Math.random() * weights.reduce((a, b) => a + b, 0);
     for (let i = 0; i < skills.length; i++) { r -= weights[i]; if (r <= 0) return skills[i]; }
     return skills[skills.length - 1];

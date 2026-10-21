@@ -735,3 +735,13 @@ p {
 .pstats { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; font-size: 0.6rem; font-weight: 800; border-top: 1px solid rgba(0,0,0,0.25); padding-top: 0.25rem; }
 .pstats b { display: block; font-size: 0.95rem; }
 .plock { text-align: center; font-size: 0.8rem; font-weight: 700; }
+
+/* Figures de géométrie */
+.geo-figure { width: 100%; max-width: 440px; height: auto; display: block; margin: 0 auto 1rem; }
+.geo-support { stroke: #64748b; stroke-width: 1.5; }
+.geo-main { stroke: #22d3ee; stroke-width: 4; stroke-linecap: round; }
+.geo-main-fill { fill: #22d3ee; }
+.geo-pt { stroke: #f8fafc; stroke-width: 2.2; stroke-linecap: round; }
+.geo-label { fill: #f8fafc; font-size: 20px; font-weight: 800; }
+
+.btn-symbol { font-size: 2.2rem; font-weight: 800; min-height: 4rem; }
