@@ -1,8 +1,8 @@
 // Incrémenter VERSION à chaque publication pour forcer la mise à jour du cache
-const VERSION = 'sq-v11';
+const VERSION = 'sq-v12';
 const FILES = [
     './', 'index.html', 'style.css', 'manifest.webmanifest',
-    'js/main.js', 'js/sync.js', 'js/state.js', 'js/engine.js', 'js/render.js',
+    'js/main.js', 'js/sync.js', 'js/push.js', 'js/state.js', 'js/engine.js', 'js/render.js',
     'js/content/index.js', 'js/content/helpers.js', 'js/content/maths.js', 'js/content/francais.js',
     'js/content/sciences.js', 'js/content/histgeo.js',
     'icons/icon-192.png', 'icons/icon-512.png'
@@ -32,4 +32,23 @@ self.addEventListener('fetch', e => {
             })
             .catch(() => caches.match(e.request).then(r => r || caches.match('index.html')))
     );
+});
+
+// Rappel quotidien (web push)
+self.addEventListener('push', e => {
+    let d = {};
+    try { d = e.data.json(); } catch (err) { /* message vide */ }
+    e.waitUntil(self.registration.showNotification(d.title || 'Savoir Quest', {
+        body: d.body || 'Ta mission du jour t\'attend !',
+        icon: 'icons/icon-192.png',
+        badge: 'icons/icon-192.png',
+        tag: 'rappel-quotidien',
+        data: { url: './index.html' }
+    }));
+});
+
+self.addEventListener('notificationclick', e => {
+    e.notification.close();
+    e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list =>
+        list.length ? list[0].focus() : self.clients.openWindow('./index.html')));
 });

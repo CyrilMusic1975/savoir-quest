@@ -33,6 +33,15 @@
                     <div id="streak-info" class="streak-info"></div>
                 </div>
 
+                <div id="reminder-banner" class="reminder-banner hidden">
+                    <div>🔔 Reçois un rappel chaque jour à 17 h 30 si tu n'as pas encore joué.</div>
+                    <div class="reminder-actions">
+                        <button id="reminder-yes" class="btn btn-primary">Activer</button>
+                        <button id="reminder-later" class="btn btn-secondary">Plus tard</button>
+                    </div>
+                    <div id="reminder-msg" class="backup-status"></div>
+                </div>
+
                 <div class="options-grid home-actions">
                     <button id="resume-btn" class="btn btn-secondary hidden">▶ REPRENDRE MA MISSION</button>
                     <button id="daily-btn" class="btn btn-primary hidden">⭐ MISSION DU JOUR</button>
@@ -47,6 +56,11 @@
                     <label class="setting"><input type="checkbox" id="setting-timer"> Afficher le chrono</label>
                     <label class="setting"><input type="checkbox" id="setting-sound"> Sons</label>
                     <div class="parent-link">
+                        <div class="setting-title">🔔 Rappel quotidien (17 h 30)</div>
+                        <p id="reminder-status">Non activé.</p>
+                        <button id="reminder-settings-btn" class="btn btn-secondary">Activer le rappel</button>
+                    </div>
+                    <div class="parent-link">
                         <div class="setting-title">👪 Suivi parent</div>
                         <p class="parent-info">Tes parents voient : le prénom de ton profil, la matière, si tu as bien répondu, la date, et les questions que tu rates avec ta réponse. Rien d'autre. <span id="sync-pending"></span></p>
                     </div>
@@ -58,7 +72,7 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v11</div>
+                <div class="version">v12</div>
             </div>
         </div>
 

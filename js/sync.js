@@ -18,6 +18,8 @@ function save() {
 
 export const pending = () => state.queue.length;
 
+export async function getToken() { return token(); }
+
 async function token() {
     if (state.idToken && state.exp > Date.now() + 60000) return state.idToken;
     if (state.refreshToken) {
@@ -74,6 +76,17 @@ function toWrite(ev) {
     }
     const id = `${ev.ts}-${Math.random().toString(36).slice(2, 8)}`;
     return { update: { name: `projects/${CFG.projectId}/databases/(default)/documents/events/${id}`, fields }, currentDocument: { exists: false } };
+}
+
+// Écrit (ou remplace) un document de la collection indiquée
+export async function putDoc(path, fields) {
+    const idToken = await token();
+    const res = await fetch(`${DOCS}/${path}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ fields })
+    });
+    return res.ok;
 }
 
 export async function flush() {

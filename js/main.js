@@ -3,6 +3,7 @@ import * as S from './state.js';
 import { buildSession, recordAnswer, completeSession, countToReview, countDue, currentStreak, doneToday, badgeProgress, TIERS } from './engine.js';
 import { renderQuestion } from './render.js';
 import * as Sync from './sync.js';
+import * as Push from './push.js';
 
 const $ = id => document.getElementById(id);
 const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), game: $('game-screen'), end: $('end-screen') };
@@ -128,6 +129,8 @@ function updateHome() {
     if (!p) { $('resume-btn').classList.add('hidden'); $('errors-btn').classList.add('hidden'); return; }
 
     $('total-xp-display').textContent = `${p.name} : ${p.totalXP || 0} XP`;
+    if (typeof updateReminderUI === 'function') updateReminderUI();
+    if (Push.isEnabled()) Push.register(p.name);
     const streak = currentStreak(p);
     $('streak-info').textContent = streak > 0
         ? `🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite${doneToday(p) ? ' — mission du jour faite ✅' : ''}`
@@ -474,6 +477,34 @@ function updateSyncUI() {
 }
 updateSyncUI();
 setInterval(updateSyncUI, 5000);
+
+// ---------- Rappel quotidien ----------
+function updateReminderUI() {
+    const p = S.currentProfile();
+    const supported = Push.isSupported();
+    const on = Push.isEnabled();
+    const denied = Push.permission() === 'denied';
+    $('reminder-status').textContent = !supported
+        ? 'Non disponible ici : installe d\'abord l\'appli sur l\'écran d\'accueil.'
+        : on ? 'Activé ✅ (tu recevras un rappel à 17 h 30 si tu n\'as pas joué).'
+        : denied ? 'Bloqué : autorise les notifications dans les réglages du navigateur.' : 'Non activé.';
+    $('reminder-settings-btn').classList.toggle('hidden', !supported || on || denied);
+    let dismissed = false;
+    try { dismissed = localStorage.getItem('sq_reminder_dismissed') === '1'; } catch (e) { /* ignoré */ }
+    $('reminder-banner').classList.toggle('hidden', !p || !supported || on || denied || dismissed);
+}
+async function activateReminder(msgEl) {
+    const p = S.currentProfile();
+    msgEl.textContent = 'Activation…';
+    const r = await Push.enable(p ? p.name : '');
+    msgEl.textContent = r === 'ok' ? 'Rappel activé ✅' : r === 'denied' ? 'Notifications refusées.' : r === 'dismissed' ? 'Rien n\'est activé : réessaie et touche « Autoriser ».' : 'Impossible d\'activer le rappel pour le moment.';
+    updateReminderUI();
+}
+$('reminder-yes').addEventListener('click', () => activateReminder($('reminder-msg')));
+$('reminder-settings-btn').addEventListener('click', () => activateReminder($('reminder-status')));
+$('reminder-later').addEventListener('click', () => { try { localStorage.setItem('sq_reminder_dismissed', '1'); } catch (e) { /* ignoré */ } updateReminderUI(); });
+// le rappel mentionne le prénom du profil actif : on met l'abonnement à jour quand on change de profil
+updateReminderUI();
 
 // ---------- PWA : hors ligne + stockage durable ----------
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
