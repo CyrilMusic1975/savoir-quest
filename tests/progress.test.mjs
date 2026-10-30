@@ -13,8 +13,8 @@ export function run(fail) {
     eq(weekId(new Date(2027, 0, 1)), '2026-S53', 'passage d\'année');
     // saison : changement de semaine
     const p = ensureProfile({ id: 'p', name: 'T' });
-    ensureSeason(p, '2026-S43'); addSeasonXP(p, 100);
-    const up = addSeasonXP(p, 1500);
+    ensureSeason(p, '2026-S43'); addSeasonXP(p, 100, '2026-S43');
+    const up = addSeasonXP(p, 1500, '2026-S43');
     eq(up && up.name, 'Argent', 'passage en Argent');
     ensureSeason(p, '2026-S44');
     eq(p.season.xp, 0, 'saison remise à zéro'); eq(p.seasons.length, 1, 'saison archivée'); eq(p.seasons[0].league, 'Argent', 'ligue archivée'); eq(p.pendingSeasonReview.week, '2026-S43', 'bilan de saison à montrer');

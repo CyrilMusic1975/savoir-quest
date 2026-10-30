@@ -587,8 +587,17 @@ export function generateDecimalOperationQuestion() {
     const A = a / 10, B = b / 100;
     const res = add ? a * 10 + b : a * 10 - b;
     const ans = fmtNum((res / 100).toFixed(2));
+    // Soustraction : cases à toucher pour retirer le nombre par morceaux (en centièmes), sans afficher le résultat
+    let visual;
+    if (!add) {
+        const units = b % 10, tens = b - units;
+        const chips = [tens, units].filter(Boolean);
+        const decoys = shuffle([10, 20, 30, 50, 5, 2].filter(c => !chips.includes(c)));
+        visual = { type: 'decimal-sub', start: a * 10, target: b, chips: [...chips, ...decoys.slice(0, 6 - chips.length)].sort((x, y) => y - x) };
+    }
     return {
         kind: 'input', numeric: true, accept: [ans], answer: ans, type: 'decimal',
+        ...(visual && { visual }),
         text: `Calcule : ${fmtNum(A.toFixed(1))} ${add ? '+' : '−'} ${fmtNum(B.toFixed(2))}`,
         explanation: `Aligne les virgules : ${fmtNum(A.toFixed(2))} ${add ? '+' : '−'} ${fmtNum(B.toFixed(2))} = ${ans}.`
     };

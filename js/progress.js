@@ -30,8 +30,8 @@ export function ensureSeason(profile, week = weekId()) {
 }
 
 // Ajoute des XP à la saison ; retourne la ligue atteinte si elle vient de changer
-export function addSeasonXP(profile, xp) {
-    ensureSeason(profile);
+export function addSeasonXP(profile, xp, week = weekId()) {
+    ensureSeason(profile, week);
     const before = leagueFor(profile.season.xp);
     profile.season.xp += xp;
     const after = leagueFor(profile.season.xp);

@@ -2,6 +2,11 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v19 — Aide visuelle pour les soustractions de décimaux
+- Sur chaque soustraction de décimaux, des cases (0,40 ; 0,05 ; 0,10…) s'affichent d'emblée : en les touchant, l'élève retire le nombre par morceaux et voit le total évoluer. Il saisit lui-même la réponse.
+- Nouveau contrôle : l'aide est recalculée de façon indépendante (départ, nombre à retirer, cases suffisantes).
+- Test de saison rendu indépendant de la date du jour (`addSeasonXP` accepte une semaine en paramètre).
+
 ## v18 — Sauvegarde automatique de la progression
 - La progression est sauvegardée automatiquement dans Firebase (collection `backups`, un document par installation) après chaque mission, à l'ouverture et à la mise en arrière-plan.
 - Tableau de bord : section « Sauvegardes automatiques » avec téléchargement du fichier, restaurable par le bouton « Restaurer » de l'application.

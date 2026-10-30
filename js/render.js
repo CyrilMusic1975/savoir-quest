@@ -50,6 +50,39 @@ function drawGeo(v, area) {
     area.appendChild(svg);
 }
 
+// --- Aide soustraction de décimaux : on retire le nombre par morceaux (valeurs en centièmes) ---
+const cents = n => (n / 100).toFixed(2).replace('.', ',');
+function drawDecimalSub(v, area) {
+    const c = el('div', 'decsub');
+    c.appendChild(el('div', 'decsub-hint', 'Retire le nombre par morceaux : touche les cases dont le total fait ' + cents(v.target) + '.'));
+    const chips = el('div', 'decsub-chips');
+    const state = el('div', 'decsub-state');
+    const msg = el('div', 'decsub-msg');
+    const on = new Set();
+    const update = () => {
+        const removed = [...on].reduce((t, i) => t + v.chips[i], 0);
+        state.textContent = `${cents(v.start)} − ${cents(removed)} → ${cents(v.start - removed)}`;
+        msg.textContent = removed === v.target ? `Tu as retiré exactement ${cents(v.target)}. Écris ce qui reste.`
+            : removed > v.target ? 'Tu as retiré trop : enlève une case.' : `Il faut encore retirer ${cents(v.target - removed)}.`;
+        msg.classList.toggle('ok', removed === v.target);
+    };
+    v.chips.forEach((val, i) => {
+        const b = el('button', 'decsub-chip', cents(val));
+        b.type = 'button';
+        b.setAttribute('aria-pressed', 'false');
+        b.onclick = () => {
+            const pressed = on.delete(i) ? false : (on.add(i), true);
+            b.classList.toggle('on', pressed);
+            b.setAttribute('aria-pressed', String(pressed));
+            update();
+        };
+        chips.appendChild(b);
+    });
+    c.append(chips, state, msg);
+    update();
+    area.appendChild(c);
+}
+
 // --- Visuels (au-dessus de la question) ---
 function renderVisual(q, area) {
     area.innerHTML = '';
@@ -84,6 +117,8 @@ function renderVisual(q, area) {
         table.appendChild(head);
         c.appendChild(table);
         area.appendChild(c);
+    } else if (v.type === 'decimal-sub') {
+        drawDecimalSub(v, area);
     } else if (v.type === 'geo') {
         drawGeo(v, area);
     } else if (v.type === 'text-display') {
