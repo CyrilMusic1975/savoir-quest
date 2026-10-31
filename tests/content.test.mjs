@@ -38,6 +38,11 @@ export function run(fail) {
             } else fail(`${at} : type inconnu « ${kind} »`);
         }
     }
+    // Les questions sur les décimaux n'emploient plus « s'arrête » (ambigu pour un enfant : tout nombre écrit finit par s'arrêter)
+    for (const q of SKILLS.flatMap(s => s.bank || []).filter(q => /^dec_d\d+$/.test(q.id))) {
+        const texte = [q.text, q.explanation, ...(q.options || [])].join(' ');
+        if (/arrête/i.test(texte)) fail(`${q.id} : formulation ambiguë « s'arrête » (dire « a une fin » / « continue sans fin »)`);
+    }
     // dec_d13 : recalcul indépendant (écriture qui s'arrête ET partie décimale non nulle)
     const d13 = SKILLS.flatMap(s => s.bank || []).find(q => q.id === 'dec_d13');
     if (!d13) fail('dec_d13 introuvable');

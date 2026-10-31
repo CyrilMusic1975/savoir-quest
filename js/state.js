@@ -68,8 +68,8 @@ export function setActiveId(id) {
 export const currentProfile = () => getProfiles().find(p => p.id === getActiveId());
 
 export function getSettings() {
-    try { return { timer: false, sound: true, ...JSON.parse(localStorage.getItem(SETTINGS_KEY)) }; }
-    catch (e) { return { timer: false, sound: true }; }
+    try { return { timer: false, sound: true, kiko: true, ...JSON.parse(localStorage.getItem(SETTINGS_KEY)) }; }
+    catch (e) { return { timer: false, sound: true, kiko: true }; }
 }
 export function setSettings(s) {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch (e) { /* ignoré */ }

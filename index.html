@@ -56,6 +56,7 @@
                     <summary>⚙️ Réglages et sauvegarde</summary>
                     <label class="setting"><input type="checkbox" id="setting-timer"> Afficher le chrono</label>
                     <label class="setting"><input type="checkbox" id="setting-sound"> Sons</label>
+                    <label class="setting"><input type="checkbox" id="setting-kiko"> Kiko, la mascotte</label>
                     <div class="parent-link">
                         <div class="setting-title">🔔 Rappel quotidien (17 h 30)</div>
                         <p id="reminder-status">Non activé.</p>
@@ -73,7 +74,7 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v20</div>
+                <div class="version">v21</div>
             </div>
         </div>
 
@@ -111,6 +112,11 @@
 
             <div id="streak-badge" class="streak-badge" aria-live="polite">COMBO x2 🔥</div>
 
+            <div id="kiko" class="kiko hidden">
+                <img id="kiko-img" class="kiko-img" src="img/kiko.png" alt="Kiko, ta mascotte" width="64" height="64">
+                <div id="kiko-bubble" class="kiko-bubble" aria-live="polite"></div>
+            </div>
+
             <div class="progress-container">
                 <div id="progress-bar" class="progress-bar"></div>
             </div>
@@ -123,7 +129,7 @@
             <div id="options-container" class="options-grid" role="group" aria-label="Réponses"></div>
 
             <div id="explanation-box" class="explanation-box hidden">
-                <div class="explanation-header">💡 Explication</div>
+                <div class="explanation-header">💡 Kiko t'explique</div>
                 <div id="explanation-text" class="explanation-text"></div>
                 <button id="continue-btn" class="btn btn-primary btn-block">J'AI COMPRIS, ON CONTINUE !</button>
             </div>

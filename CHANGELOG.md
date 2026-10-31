@@ -2,6 +2,13 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v21 — Kiko, la mascotte
+- Kiko (personnage en pixels avec un ballon, image `img/kiko.png`) accompagne l'élève pendant les missions : une bulle l'accueille, l'encourage après une bonne réponse (plus fort en série), lui donne un conseil pour réfléchir à chaque question, et le rassure après une erreur. Il saute de joie ou penche la tête.
+- L'encadré d'explication s'appelle désormais « Kiko t'explique ». Réglage « Kiko, la mascotte » pour le masquer.
+- Phrases dans `js/kiko.js` (choix pur et testé, sans hasard) ; nouveau contrôle `tests/kiko.test.mjs`.
+- Décimaux : « s'arrête » (ambigu pour un enfant) remplacé par « a une fin » / « continue sans fin » dans `dec_d01`, `d02`, `d09` à `d13`. Nouveau contrôle qui refuse l'ancienne formulation.
+- Pas encore fait : seconde chance après un rappel, expressions dessinées différentes.
+
 ## v20 — Question sur l'association « décimal » / « nombre à virgule »
 - Nouvelle question `dec_d13` : repérer le nombre décimal qui n'est pas entier parmi 7,0 (égal à un entier), 4,333… (ne s'arrête pas), 12 et 4,25. Elle montre si l'élève confond « décimal » et « écrit avec une virgule ».
 - Nouveau contrôle : la bonne réponse est recalculée de façon indépendante (écriture qui s'arrête, partie décimale non nulle).

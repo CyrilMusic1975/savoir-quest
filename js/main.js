@@ -5,6 +5,7 @@ import { renderQuestion } from './render.js';
 import * as Sync from './sync.js';
 import * as Push from './push.js';
 import * as P from './progress.js';
+import { kikoSays, onQuestion, onResult } from './kiko.js';
 
 const $ = id => document.getElementById(id);
 const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), game: $('game-screen'), end: $('end-screen') };
@@ -123,6 +124,7 @@ function updateHome() {
     const settings = S.getSettings();
     $('setting-timer').checked = settings.timer;
     $('setting-sound').checked = settings.sound;
+    $('setting-kiko').checked = settings.kiko;
     const loggedIn = !!p;
     $('profile-selection-area').classList.toggle('hidden', loggedIn);
     $('active-profile-info').classList.toggle('hidden', !loggedIn);
@@ -326,6 +328,19 @@ function startTimer() {
 }
 const stopTimer = () => clearInterval(timerInterval);
 
+// Kiko : bulle de texte et petite animation (ne bloque jamais la question)
+function kikoSay(event, mood) {
+    const box = $('kiko');
+    const on = S.getSettings().kiko;
+    box.classList.toggle('hidden', !on);
+    if (!on) return;
+    $('kiko-bubble').textContent = kikoSays(event, game.index);
+    const img = $('kiko-img');
+    img.classList.remove('jump', 'tilt');
+    void img.offsetWidth; // relance l'animation
+    if (mood) img.classList.add(mood);
+}
+
 function nextQuestion() {
     if (game.index >= game.questions.length) { endGame(); return; }
     game.locked = false;
@@ -342,6 +357,7 @@ function nextQuestion() {
     }
     progressBar.style.width = `${(game.index / game.questions.length) * 100}%`;
     persistSession();
+    kikoSay(onQuestion(game.index));
     game.qStart = Date.now();
     renderQuestion(q, { visualArea, optionsBox }, onAnswer);
 }
@@ -372,6 +388,7 @@ function onAnswer(correct, given) {
         playSound(440 + game.streak * 50, 'triangle', 0.2);
         scoreDisplay.textContent = `Score: ${game.score}`;
         S.saveProfiles();
+        kikoSay(onResult(true, game.streak), 'jump');
         setTimeout(() => { game.index++; nextQuestion(); }, 1500);
     } else {
         game.streak = 0;
@@ -381,6 +398,7 @@ function onAnswer(correct, given) {
         if (game.mode === 'daily') updateBoard();
         S.saveProfiles();
         stopTimer();
+        kikoSay(onResult(false, 0), 'tilt');
         explanationBox.classList.remove('hidden');
         explanationText.textContent = q.explanation || 'Prends ton temps pour relire ! Sers-toi de ton brouillon au besoin.';
         explanationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -485,6 +503,7 @@ const showSpecialReward = r => showOverlay({ title: 'RÉCOMPENSE PSG 🔴🔵', 
 // ---------- Réglages ----------
 $('setting-timer').addEventListener('change', e => S.setSettings({ ...S.getSettings(), timer: e.target.checked }));
 $('setting-sound').addEventListener('change', e => S.setSettings({ ...S.getSettings(), sound: e.target.checked }));
+$('setting-kiko').addEventListener('change', e => S.setSettings({ ...S.getSettings(), kiko: e.target.checked }));
 
 // ---------- Sauvegarde / restauration ----------
 const backupStatus = $('backup-status');
