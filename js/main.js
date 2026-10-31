@@ -6,7 +6,7 @@ import * as Sync from './sync.js';
 import * as Push from './push.js';
 import * as P from './progress.js';
 import * as C from './championnat.js';
-import { kikoSays, onQuestion, onResult, canRetry } from './kiko.js';
+import { kikoSays, onQuestion, onResult, canRetry, nextTip } from './kiko.js';
 
 const $ = id => document.getElementById(id);
 const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), champ: $('champ-screen'), game: $('game-screen'), end: $('end-screen') };
@@ -139,6 +139,7 @@ function updateHome() {
     P.ensureSeason(p);
     renderSeason(p);
     renderChamp(p);
+    renderTip(p);
     const streak = currentStreak(p);
     $('streak-info').textContent = streak > 0
         ? `🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite${doneToday(p) ? ' — mission du jour faite ✅' : ''}`
@@ -208,6 +209,21 @@ function renderSubjects() {
         btn.onclick = () => startSession('subject', sub.id);
         grid.appendChild(btn);
     });
+}
+
+// ---------- Explication d'un objectif par Kiko (une par jour) ----------
+function renderTip(p) {
+    const box = $('kiko-tip');
+    const tip = S.getSettings().kiko ? nextTip(p.kikoTips, S.today(), p.kikoTipDay) : null;
+    box.classList.toggle('hidden', !tip);
+    if (!tip) return;
+    $('kiko-tip-text').textContent = tip.text;
+    $('kiko-tip-ok').onclick = () => {
+        p.kikoTips.push(tip.id);
+        p.kikoTipDay = S.today();
+        S.saveProfiles();
+        box.classList.add('hidden');
+    };
 }
 
 // ---------- Championnat ----------

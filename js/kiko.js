@@ -48,6 +48,23 @@ export function kikoSays(event, n = 0) {
     return list[Math.abs(n) % list.length];
 }
 
+// Explications des objectifs, une par jour, dans cet ordre (une fois vues, elles ne reviennent plus)
+export const TIPS = [
+    { id: 'match', text: 'Chaque mission est un match de foot ! Une bonne réponse, c’est un but pour toi. Une erreur, c’est un but pour l’adversaire. Essaie de gagner !' },
+    { id: 'championnat', text: 'Tu joues dans un championnat de 10 équipes. Chaque mission est une journée : victoire 3 points, nul 1 point. Vise la première place !' },
+    { id: 'xp', text: 'Les XP sont tes points d’expérience. Chaque bonne réponse t’en rapporte, et une série de bonnes réponses en rapporte encore plus.' },
+    { id: 'ligue', text: 'Les XP de la semaine te font monter de ligue : Bronze, Argent, Or, puis Champion. Ça repart de zéro chaque lundi !' },
+    { id: 'cartes', text: 'Réussis souvent une même matière pour gagner une carte de joueur : bronze, argent, puis or. Tu les retrouves dans « Ma collection ».' },
+    { id: 'records', text: 'Ton meilleur score et ta plus longue série de bonnes réponses sont des records. Essaie de les battre !' },
+    { id: 'serie', text: 'Fais au moins une mission chaque jour pour garder ta série de jours. Plus elle est longue, plus tu es fort !' }
+];
+
+// Prochaine explication à montrer : pas deux le même jour, et seulement celles qu'on n'a pas vues
+export function nextTip(seen, day, lastDay) {
+    if (lastDay === day) return null;
+    return TIPS.find(t => !seen.includes(t.id)) || null;
+}
+
 // Événement à annoncer quand la question suivante s'affiche
 export const onQuestion = index => (index === 0 ? 'start' : 'think');
 // Seconde chance : une question peut en avoir une si elle a un coup de pouce, au moins 3 options (qcm) ou une saisie

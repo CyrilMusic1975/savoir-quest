@@ -41,6 +41,8 @@ export function ensureProfile(p) {
     p.daily = p.daily || { streak: 0, last: null };
     p.champ = p.champ || null;
     p.champHistory = p.champHistory || [];
+    p.kikoTips = p.kikoTips || [];
+    p.kikoTipDay = p.kikoTipDay || null;
     p.schemaVersion = 2;
     return p;
 }

@@ -2,6 +2,11 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v25 — Kiko explique les objectifs, un par jour
+- Sur l'accueil, Kiko présente un objectif à la fois, une fois par jour : le match, le championnat, les XP, la ligue de la semaine, les cartes de joueur, les records, puis la série de jours. L'élève valide avec « J'ai compris » ; une explication vue ne revient pas.
+- Les explications vues sont retenues dans le profil (`kikoTips`, `kikoTipDay`, ajoutés par `ensureProfile`). Elles disparaissent si on désactive Kiko dans les réglages.
+- Nouveau contrôle : ordre, unicité, longueur et rythme d'une explication par jour.
+
 ## v24 — Coups de pouce pour les autres questions de maths
 - 16 questions de plus ont un coup de pouce de Kiko (seconde chance) : vocabulaire des rangs (`dec_r01` à `dec_r07`), zéros facultatifs (`dec_z01` à `dec_z03`) et géométrie (`geo_c01`, `c02`, `c11` à `c14`).
 - Il reste les vrai/faux et les remises en ordre / associations, qui n'ont pas de seconde chance, et les autres matières.

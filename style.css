@@ -792,3 +792,7 @@ p {
 /* Seconde chance : coup de pouce de Kiko */
 .hint-box { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 1rem; background: rgba(34,211,238,0.1); border: 2px solid var(--accent); }
 .hint-box .explanation-header { color: var(--accent); }
+
+/* Explication d'un objectif par Kiko */
+.kiko-tip { margin: 1rem 0 0; text-align: left; align-items: flex-start; }
+.kiko-tip-ok { margin-top: 0.5rem; padding: 0.4rem 0.9rem; font-size: 0.9rem; }
