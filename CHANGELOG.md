@@ -2,6 +2,10 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v24 — Coups de pouce pour les autres questions de maths
+- 16 questions de plus ont un coup de pouce de Kiko (seconde chance) : vocabulaire des rangs (`dec_r01` à `dec_r07`), zéros facultatifs (`dec_z01` à `dec_z03`) et géométrie (`geo_c01`, `c02`, `c11` à `c14`).
+- Il reste les vrai/faux et les remises en ordre / associations, qui n'ont pas de seconde chance, et les autres matières.
+
 ## v23 — Seconde chance avec un coup de pouce de Kiko
 - Quand l'élève se trompe sur une question qui a un coup de pouce (champ `hint`), la bonne réponse n'est pas révélée : Kiko donne une piste, l'option ratée est écartée et l'élève réessaie une fois.
 - Second essai juste : un but pour l'élève et 50 points (ni série ni badge). Second essai raté : but adverse et explication complète, comme avant.

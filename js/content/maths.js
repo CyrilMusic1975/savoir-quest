@@ -1,4 +1,4 @@
-import { shuffle, pick, randInt, fmtNum, generateOptions, numOptions, qcm } from './helpers.js';
+import { shuffle, pick, randInt, fmtNum, generateOptions, numOptions, qcm, withHint } from './helpers.js';
 
 // Renseigné par le moteur avant chaque génération (maîtrise du profil actif)
 export const ctx = { mastery: {}, weak: {} };
@@ -605,13 +605,13 @@ export function generateDecimalOperationQuestion() {
 
 // ===== Questions de cours (vocabulaire des rangs, issues de la fiche 6e "Nombres décimaux") =====
 const rangsBank = [
-    qcm('dec_r01', 'Le premier chiffre avant la virgule est toujours le chiffre des…', 'unités', ['dizaines', 'dixièmes', 'centièmes'], 'Le chiffre juste avant la virgule est toujours celui des unités.'),
-    qcm('dec_r02', 'Le premier chiffre après la virgule est toujours le chiffre des…', 'dixièmes', ['centièmes', 'unités', 'dizaines'], 'Après la virgule : dixièmes, puis centièmes, puis millièmes.'),
-    qcm('dec_r03', 'Le deuxième chiffre après la virgule est celui des…', 'centièmes', ['dixièmes', 'millièmes', 'unités'], 'Dixièmes (1er), centièmes (2e), millièmes (3e).'),
-    qcm('dec_r04', 'Le troisième chiffre après la virgule est celui des…', 'millièmes', ['centièmes', 'dixièmes', 'dizaines'], 'Dixièmes (1er), centièmes (2e), millièmes (3e).'),
-    qcm('dec_r05', 'Juste à gauche du chiffre des unités, on trouve le chiffre des…', 'dizaines', ['dixièmes', 'centaines', 'centièmes'], 'En allant vers la gauche : unités, dizaines, centaines, milliers.'),
-    qcm('dec_r06', 'Combien de centièmes y a-t-il dans 1 dixième ?', '10', ['100', '1', '1 000'], '1 dixième = 10 centièmes, car 1/10 = 10/100.', 2),
-    qcm('dec_r07', 'Quel nombre est égal à 3 unités et 5 centièmes ?', '3,05', ['3,5', '3,005', '35'], '5 centièmes s\'écrivent au 2e rang après la virgule : 3,05.', 2)
+    withHint(qcm('dec_r01', 'Le premier chiffre avant la virgule est toujours le chiffre des…', 'unités', ['dizaines', 'dixièmes', 'centièmes'], 'Le chiffre juste avant la virgule est toujours celui des unités.'), "Écris 7,3 dans un tableau de numération : dans quelle colonne se trouve le 7, collé à la virgule ?"),
+    withHint(qcm('dec_r02', 'Le premier chiffre après la virgule est toujours le chiffre des…', 'dixièmes', ['centièmes', 'unités', 'dizaines'], 'Après la virgule : dixièmes, puis centièmes, puis millièmes.'), "Après la virgule, les rangs deviennent de plus en plus petits. Quel est le tout premier rang, collé à la virgule ?"),
+    withHint(qcm('dec_r03', 'Le deuxième chiffre après la virgule est celui des…', 'centièmes', ['dixièmes', 'millièmes', 'unités'], 'Dixièmes (1er), centièmes (2e), millièmes (3e).'), "Après la virgule on compte : premier rang, deuxième rang, troisième rang. Retrouve le nom du deuxième."),
+    withHint(qcm('dec_r04', 'Le troisième chiffre après la virgule est celui des…', 'millièmes', ['centièmes', 'dixièmes', 'dizaines'], 'Dixièmes (1er), centièmes (2e), millièmes (3e).'), "Après la virgule on compte : premier rang, deuxième rang, troisième rang. Retrouve leurs noms dans l'ordre."),
+    withHint(qcm('dec_r05', 'Juste à gauche du chiffre des unités, on trouve le chiffre des…', 'dizaines', ['dixièmes', 'centaines', 'centièmes'], 'En allant vers la gauche : unités, dizaines, centaines, milliers.'), "Dans 345, quel est le nom du rang du 4 ? Le 5, lui, est juste à sa droite."),
+    withHint(qcm('dec_r06', 'Combien de centièmes y a-t-il dans 1 dixième ?', '10', ['100', '1', '1 000'], '1 dixième = 10 centièmes, car 1/10 = 10/100.', 2), "Coupe un dixième de chocolat en parts égales pour faire des centièmes : combien de parts obtiens-tu ?"),
+    withHint(qcm('dec_r07', 'Quel nombre est égal à 3 unités et 5 centièmes ?', '3,05', ['3,5', '3,005', '35'], '5 centièmes s\'écrivent au 2e rang après la virgule : 3,05.', 2), "Où se place le chiffre des centièmes après la virgule ? Les rangs vides se remplissent avec des zéros.")
 ];
 
 export const mathsSkills = [
