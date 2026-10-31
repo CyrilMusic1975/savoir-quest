@@ -2,6 +2,13 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v22 — Championnat à 10 équipes
+- Chaque mission est désormais un match de championnat : 10 équipes (Kiko FC et 9 équipes fictives), 18 journées aller-retour, victoire 3 points, nul 1. Plus de « mission du jour » seule : toutes les missions comptent.
+- La place de l'équipe est bien visible : grande carte « 8e sur 10 » sur l'accueil (avec le podium), classement complet en fin de mission avec la ligne de Kiko FC en évidence et la flèche de progression, écran dédié avec l'historique des saisons.
+- À la 18e journée : fin de saison (champion ou non), puis nouvelle saison avec d'autres équipes.
+- Le match affiche l'adversaire de la journée et le numéro de journée ; le bonus d'XP du match s'applique à toutes les missions. La saison hebdomadaire (Bronze → Champion) est conservée.
+- Nouveau contrôle : calendrier (chaque rencontre deux fois, une fois à domicile) et classement recalculés de façon indépendante ; vérifié en cassant volontairement le calcul des points.
+
 ## v21 — Kiko, la mascotte
 - Kiko (personnage en pixels avec un ballon, image `img/kiko.png`) accompagne l'élève pendant les missions : une bulle l'accueille, l'encourage après une bonne réponse (plus fort en série), lui donne un conseil pour réfléchir à chaque question, et le rassure après une erreur. Il saute de joie ou penche la tête.
 - L'encadré d'explication s'appelle désormais « Kiko t'explique ». Réglage « Kiko, la mascotte » pour le masquer.

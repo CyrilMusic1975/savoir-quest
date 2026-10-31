@@ -767,3 +767,24 @@ p {
 @keyframes kiko-jump { 0% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 100% { transform: translateY(0); } }
 @keyframes kiko-tilt { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-12deg); } 60% { transform: rotate(8deg); } }
 @media (prefers-reduced-motion: reduce) { .kiko-img, .kiko-img.jump, .kiko-img.tilt { animation: none; } }
+
+/* Championnat */
+.champ-card { display: block; width: 100%; margin-top: 1rem; padding: 0.8rem 1rem; text-align: left; font: inherit; color: inherit; cursor: pointer; background: linear-gradient(135deg, rgba(251,191,36,0.14), rgba(255,255,255,0.04)); border: 2px solid var(--streak-gold); border-radius: 1rem; }
+.champ-top { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.5rem; }
+.champ-rank { flex: none; min-width: 4.2rem; text-align: center; line-height: 1; }
+.champ-rank b { display: block; font-size: 2.6rem; color: var(--streak-gold); }
+.champ-rank span { font-size: 0.8rem; color: var(--text-muted); }
+.champ-info { font-size: 0.9rem; line-height: 1.35; }
+.champ-title { font-weight: 800; color: var(--streak-gold); }
+.champ-more { margin-top: 0.4rem; text-align: right; font-size: 0.8rem; color: var(--accent); }
+.champ-table { margin: 0.4rem 0; }
+.champ-row { display: grid; grid-template-columns: 1.6rem 1fr 1.8rem 2.6rem 2.4rem; gap: 0.3rem; align-items: center; padding: 0.3rem 0.5rem; font-size: 0.85rem; border-radius: 0.5rem; text-align: right; }
+.champ-row .rk, .champ-row .nm { text-align: left; }
+.champ-row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.champ-row-head { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; }
+.champ-row.me { background: rgba(251,191,36,0.28); outline: 2px solid var(--streak-gold); font-weight: 800; }
+.end-champ { margin-bottom: 1.25rem; padding: 1rem; border-radius: 1.2rem; background: rgba(255,255,255,0.05); }
+.champ-head { font-weight: 800; margin-bottom: 0.3rem; }
+.champ-move { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+.champ-move.up { color: var(--success); } .champ-move.down { color: #fca5a5; } .champ-move.same { color: var(--text-muted); }
+.champ-row-head span:nth-child(2) { text-align: left; }

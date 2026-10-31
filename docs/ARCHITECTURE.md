@@ -24,7 +24,9 @@ L'application fonctionne **entièrement sans le cloud** : la progression vit dan
 |---|---|---|
 | `main.js` | Écrans, navigation, déroulement d'une mission, réglages, sauvegarde/restauration | tous |
 | `engine.js` | Construit les séances, enregistre les réponses (maîtrise, répétition espacée, badges, cas précis) | `content`, `state` |
-| `progress.js` | Saison, match du jour, records, cartes de joueur (calculs purs, sans interface) | `state` |
+| `progress.js` | Saison, match, records, cartes de joueur (calculs purs, sans interface) | `state` |
+| `championnat.js` | Championnat à 10 équipes : calendrier, simulation, classement (calculs purs) | `progress` |
+| `kiko.js` | Phrases de la mascotte Kiko et choix de l'événement (pur) | — |
 | `render.js` | Affiche chaque type de question et appelle `submit(correct, réponse)` | `content/helpers` |
 | `state.js` | Lecture/écriture des profils, réglages et séance en cours dans `localStorage` ; dates et semaines | — |
 | `sync.js` | Authentification anonyme, file d'attente locale, envoi par lots vers Firestore (REST) | — |
@@ -59,6 +61,7 @@ Stocké sous la clé `mathQuest_profiles` (liste de profils). Les champs absents
 | `badges{skill}` | Palier obtenu : 1 Bronze, 2 Argent, 3 Or |
 | `matches[]`, `matchStats` | Historique des matchs (60 au plus) et totaux victoires/nuls/défaites |
 | `records` | Meilleur score, meilleure série, plus large victoire, plus longue série de jours |
+| `champ`, `champHistory[]` | Saison de championnat en cours (scores de l'élève) et saisons terminées (rang, points) |
 | `season`, `seasons[]`, `pendingSeasonReview` | Saison en cours (semaine ISO, XP), historique, bilan à afficher |
 | `daily{streak,last}` | Série de jours consécutifs |
 
@@ -81,7 +84,8 @@ Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono
 
 ## Compétition (`progress.js`)
 
-- **Match du jour** : chaque bonne réponse est un but pour l'élève, chaque erreur un but adverse. Bonus d'XP : victoire 150, nul 50. L'adversaire (nom fictif) est fixé par la date.
+- **Match** : chaque mission est un match. Chaque bonne réponse est un but pour l'élève, chaque erreur un but adverse. Bonus d'XP : victoire 150, nul 50.
+- **Championnat** (`championnat.js`) : 10 équipes (« Kiko FC » et 9 équipes fictives tirées de `OPPONENTS`), 18 journées aller-retour (méthode du cercle), une mission = une journée. Le profil ne garde que ses scores (`champ = { n, days: [[pour, contre], …] }`) et l'historique (`champHistory`) ; les autres matchs sont simulés de façon reproductible à partir de l'identifiant du profil, donc le classement se recalcule toujours. Victoire 3 points, nul 1. À la 18e journée la saison est archivée et la suivante s'ouvre. Rien de nouveau n'est envoyé à Firebase.
 - **Saison** : une semaine ISO (lundi → dimanche). Ligues : Bronze 0, Argent 1 500, Or 3 500, Champion 6 000 XP. Au changement de semaine, la saison est archivée et un bilan s'affiche.
 - **Records** : un record n'est annoncé que s'il bat une valeur existante.
 - **Carte de joueur** : note de 60 à 99 selon le palier et la réussite récente ; statistiques PRÉ (précision), VIT (vitesse moyenne), EXP (expérience).

@@ -5,10 +5,11 @@ import { renderQuestion } from './render.js';
 import * as Sync from './sync.js';
 import * as Push from './push.js';
 import * as P from './progress.js';
+import * as C from './championnat.js';
 import { kikoSays, onQuestion, onResult } from './kiko.js';
 
 const $ = id => document.getElementById(id);
-const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), game: $('game-screen'), end: $('end-screen') };
+const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), champ: $('champ-screen'), game: $('game-screen'), end: $('end-screen') };
 const questionText = $('question-text');
 const optionsBox = $('options-container');
 const visualArea = $('visual-area');
@@ -136,6 +137,7 @@ function updateHome() {
     if (Push.isEnabled()) Push.register(p.name);
     P.ensureSeason(p);
     renderSeason(p);
+    renderChamp(p);
     const streak = currentStreak(p);
     $('streak-info').textContent = streak > 0
         ? `🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite${doneToday(p) ? ' — mission du jour faite ✅' : ''}`
@@ -207,11 +209,80 @@ function renderSubjects() {
     });
 }
 
+// ---------- Championnat ----------
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+
+function renderTable(root, rows) {
+    const head = el('div', 'champ-row champ-row-head');
+    ['#', 'Équipe', 'J', 'Diff', 'Pts'].forEach(t => head.appendChild(el('span', null, t)));
+    root.appendChild(head);
+    rows.forEach(r => {
+        const row = el('div', `champ-row${r.me ? ' me' : ''}`);
+        row.append(el('span', 'rk', String(r.rank)), el('span', 'nm', r.name), el('span', null, String(r.p)), el('span', null, (r.gd > 0 ? '+' : '') + r.gd), el('b', null, String(r.pts)));
+        root.appendChild(row);
+    });
+}
+
+// Carte de l'accueil : sa place dans le classement, bien visible
+function renderChamp(p) {
+    const card = $('champ-card');
+    card.replaceChildren();
+    const champ = C.ensureChamp(p);
+    const rows = C.standings(champ, p.id);
+    const me = C.myRow(rows);
+    const next = C.nextMatch(p);
+    const played = champ.days.length > 0;
+    const top = el('div', 'champ-top');
+    const rank = el('div', 'champ-rank');
+    rank.append(el('b', null, played ? C.ordinal(me.rank) : '—'), el('span', null, `sur ${C.N_TEAMS}`));
+    const info = el('div', 'champ-info');
+    info.append(
+        el('div', 'champ-title', `🏆 Championnat · saison ${champ.n}`),
+        el('div', null, played ? `${me.pts} point${me.pts > 1 ? 's' : ''} · journée ${next.day}/${C.DAYS} à jouer` : 'La saison commence : joue ta première mission !'),
+        el('div', 'muted', `Prochain match : ${next.opponent}`)
+    );
+    top.append(rank, info);
+    card.appendChild(top);
+    if (played) renderTable(card.appendChild(el('div', 'champ-table')), rows.filter(r => r.rank <= 3 || r.me));
+    card.appendChild(el('div', 'champ-more', 'Voir tout le classement ›'));
+}
+
+function renderChampScreen() {
+    const p = S.currentProfile();
+    const champ = C.ensureChamp(p);
+    const next = C.nextMatch(p);
+    $('champ-sub').textContent = `Saison ${champ.n} · journée ${next.day}/${C.DAYS} · prochain match : ${next.opponent}`;
+    const t = $('champ-table');
+    t.replaceChildren();
+    renderTable(t, C.standings(champ, p.id));
+    const h = $('champ-history');
+    h.replaceChildren();
+    [...p.champHistory].reverse().forEach(s => {
+        const row = el('div', 'sum-row');
+        row.append(el('span', 'sum-k', `Saison ${s.n}`), el('span', 'sum-v', `${s.rank === 1 ? '🏆 ' : ''}${C.ordinal(s.rank)} · ${s.pts} pts`));
+        h.appendChild(row);
+    });
+}
+$('champ-card').addEventListener('click', () => { renderChampScreen(); show('champ'); });
+$('champ-back-btn').addEventListener('click', () => show('home'));
+
+// Fin de mission : où en est son équipe
+function renderEndChamp(res) {
+    const box = $('end-champ');
+    box.replaceChildren();
+    box.classList.remove('hidden');
+    let move, cls = 'same';
+    if (res.rankBefore === null) move = `Premier match : tu es ${C.ordinal(res.rank)} sur ${C.N_TEAMS}`;
+    else if (res.rank < res.rankBefore) { move = `▲ Tu passes de la ${C.ordinal(res.rankBefore)} à la ${C.ordinal(res.rank)} place !`; cls = 'up'; }
+    else if (res.rank > res.rankBefore) { move = `▼ Tu glisses de la ${C.ordinal(res.rankBefore)} à la ${C.ordinal(res.rank)} place`; cls = 'down'; }
+    else move = `Tu restes ${C.ordinal(res.rank)} sur ${C.N_TEAMS}`;
+    box.append(el('div', 'champ-head', `🏆 Championnat · journée ${res.day}/${C.DAYS}`), el('div', `champ-move ${cls}`, move));
+    renderTable(box, res.table);
+}
+
 // ---------- Collection : cartes, records, matchs ----------
 $('badges-btn').addEventListener('click', () => { renderCollection(); show('badges'); });
 $('badges-back-btn').addEventListener('click', () => show('home'));
-const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
-
 function renderCollection() {
     const p = S.currentProfile();
     P.ensureSeason(p);
@@ -301,9 +372,10 @@ function updateBoard() {
 }
 function begin() {
     scoreDisplay.textContent = `Score: ${game.score}`;
-    const isMatch = game.mode === 'daily';
-    $('match-board').classList.toggle('hidden', !isMatch);
-    if (isMatch) { $('opponent-name').textContent = P.opponentOf(); updateBoard(); }
+    const next = C.nextMatch(S.currentProfile());
+    $('match-board').classList.remove('hidden');
+    $('opponent-name').textContent = `${next.opponent} · journée ${next.day}/${C.DAYS}`;
+    updateBoard();
     show('game');
     startTimer();
     nextQuestion();
@@ -383,8 +455,8 @@ function onAnswer(correct, given) {
         game.streak++;
         game.maxStreak = Math.max(game.maxStreak, game.streak);
         game.score += game.streak >= 3 ? 150 : (game.streak >= 2 ? 120 : 100);
-        showFeedback(badge ? `${badge.tier.emoji} BADGE ${badge.tier.name.toUpperCase()} !` : (game.mode === 'daily' ? (game.streak >= 3 ? '⚽ BUT ! 🔥' : '⚽ BUT !') : (game.streak >= 3 ? '🔥 INCROYABLE !' : '✨ BIEN JOUÉ !')));
-        if (game.mode === 'daily') updateBoard();
+        showFeedback(badge ? `${badge.tier.emoji} BADGE ${badge.tier.name.toUpperCase()} !` : (game.streak >= 3 ? '⚽ BUT ! 🔥' : '⚽ BUT !'));
+        updateBoard();
         playSound(440 + game.streak * 50, 'triangle', 0.2);
         scoreDisplay.textContent = `Score: ${game.score}`;
         S.saveProfiles();
@@ -394,8 +466,8 @@ function onAnswer(correct, given) {
         game.streak = 0;
         game.against++;
         playSound(150, 'sawtooth', 0.3);
-        showFeedback(game.mode === 'daily' ? '🥅 BUT ADVERSE' : '🚀 OUUPSS !');
-        if (game.mode === 'daily') updateBoard();
+        showFeedback('🥅 BUT ADVERSE');
+        updateBoard();
         S.saveProfiles();
         stopTimer();
         kikoSay(onResult(false, 0), 'tilt');
@@ -427,37 +499,32 @@ function endGame() {
     const p = S.currentProfile();
     const previousXP = p.totalXP;
     const total = game.questions.length;
-    const isMatch = game.mode === 'daily';
     P.ensureSeason(p);
 
-    // match du jour : résultat, bonus d'XP, adversaire du jour
-    let outcome = null;
-    let bonus = 0;
-    const opponent = P.opponentOf();
-    if (isMatch) {
-        outcome = P.recordMatch(p, game.correct, game.against, opponent);
-        bonus = P.MATCH_BONUS[outcome];
-    }
+    // chaque mission est un match de championnat : résultat, bonus d'XP, classement
+    const { opponent } = C.nextMatch(p);
+    const outcome = P.recordMatch(p, game.correct, game.against, opponent);
+    const bonus = P.MATCH_BONUS[outcome];
+    const champ = C.recordChampMatch(p, game.correct, game.against);
     const gained = game.score + bonus;
     p.totalXP += gained;
     const newLeague = P.addSeasonXP(p, gained);
     const wasDone = doneToday(p);
     const streak = completeSession(p);
-    const records = P.updateRecords(p, { score: gained, maxStreak: game.maxStreak, goalDiff: isMatch ? Math.max(0, game.correct - game.against) : 0 });
+    const records = P.updateRecords(p, { score: gained, maxStreak: game.maxStreak, goalDiff: Math.max(0, game.correct - game.against) });
     S.saveProfiles();
     S.clearSession(p.id);
     Sync.backup(S.getProfiles(), true);
 
     show('end');
     $('final-score').textContent = gained;
-    $('end-title').textContent = isMatch ? { win: 'Victoire !', draw: 'Match nul', loss: 'Fin du match' }[outcome] : 'Mission terminée !';
+    $('end-title').textContent = { win: 'Victoire !', draw: 'Match nul', loss: 'Fin du match' }[outcome];
     const matchBox = $('end-match');
-    matchBox.classList.toggle('hidden', !isMatch);
+    matchBox.classList.remove('hidden');
     matchBox.replaceChildren();
-    if (isMatch) {
-        matchBox.append(el('div', 'end-match-score', `⚽ ${game.correct} – ${game.against} ${opponent}`), el('div', `end-match-result ${outcome}`, P.OUTCOME_LABEL[outcome]));
-        if (bonus) matchBox.appendChild(el('div', 'muted', `Bonus de match : +${bonus} XP`));
-    }
+    matchBox.append(el('div', 'end-match-score', `⚽ ${game.correct} – ${game.against} ${opponent}`), el('div', `end-match-result ${outcome}`, P.OUTCOME_LABEL[outcome]));
+    if (bonus) matchBox.appendChild(el('div', 'muted', `Bonus de match : +${bonus} XP`));
+    renderEndChamp(champ);
     let msg;
     if (game.correct === total) msg = `PARFAIT ! ${total} sur ${total}, tu es un véritable génie !`;
     else if (game.correct >= total * 0.7) msg = 'Excellent travail, tu maîtrises bien ces notions !';
@@ -474,6 +541,11 @@ function endGame() {
     game.newBadges.forEach(b => box.appendChild(el('div', 'new-badge', `${b.tier.emoji} Nouvelle carte ${b.tier.name} : ${b.label}`)));
     game = null;
     checkPSGMilestones(previousXP, p.totalXP);
+    if (champ.finished) showOverlay({
+        title: `FIN DE LA SAISON ${champ.n}`, emoji: champ.champion ? '🏆' : '🏅',
+        headline: champ.champion ? 'Kiko FC est champion !' : `Kiko FC termine ${C.ordinal(champ.rank)}`,
+        text: champ.champion ? `${champ.pts} points : tu remportes le championnat ! Une nouvelle saison commence, ose la gagner encore.` : `${champ.pts} points sur ${3 * C.DAYS}. Une nouvelle saison commence : vise le haut du classement !`
+    });
 }
 
 // ---------- Récompenses PSG ----------

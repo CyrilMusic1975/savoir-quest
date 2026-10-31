@@ -31,6 +31,7 @@
                 <div id="active-profile-info" class="hidden mb-2">
                     <div id="total-xp-display" class="xp-pill">Total XP : 0</div>
                     <div id="streak-info" class="streak-info"></div>
+                    <button id="champ-card" class="champ-card" type="button" aria-label="Voir le classement du championnat"></button>
                     <div id="season-card" class="season-card"></div>
                 </div>
 
@@ -74,7 +75,7 @@
                     <input type="file" id="import-input" accept="application/json,.json" hidden>
                     <div id="backup-status" class="backup-status" role="status"></div>
                 </details>
-                <div class="version">v21</div>
+                <div class="version">v22</div>
             </div>
         </div>
 
@@ -95,6 +96,15 @@
             <div id="collection-summary" class="collection-summary"></div>
             <div id="badges-list" class="badges-list"></div>
             <button id="badges-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
+        </div>
+
+        <!-- Championnat -->
+        <div id="champ-screen" class="screen hidden">
+            <h1>🏆 Championnat</h1>
+            <p id="champ-sub" class="muted"></p>
+            <div id="champ-table" class="champ-table"></div>
+            <div id="champ-history" class="collection-summary"></div>
+            <button id="champ-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
         </div>
 
         <!-- Zone de Jeu -->
@@ -140,6 +150,7 @@
             <div class="animate-pop">
                 <h1 id="end-title">Félicitations !</h1>
                 <div id="end-match" class="end-match hidden"></div>
+                <div id="end-champ" class="end-champ hidden"></div>
                 <p id="end-message">Tu as terminé ta mission avec brio.</p>
                 <div class="question-card">
                     <div class="final-score" id="final-score">0</div>

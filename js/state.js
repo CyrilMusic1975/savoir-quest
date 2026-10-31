@@ -39,6 +39,8 @@ export function ensureProfile(p) {
     p.season = p.season || null;
     p.seasons = p.seasons || [];
     p.daily = p.daily || { streak: 0, last: null };
+    p.champ = p.champ || null;
+    p.champHistory = p.champHistory || [];
     p.schemaVersion = 2;
     return p;
 }

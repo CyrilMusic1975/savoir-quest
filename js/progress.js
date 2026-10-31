@@ -47,7 +47,7 @@ export function opponentOf(dateStr = today()) {
 }
 export const matchOutcome = (f, a) => (f > a ? 'win' : f === a ? 'draw' : 'loss');
 export const MATCH_BONUS = { win: 150, draw: 50, loss: 0 };
-export const OUTCOME_LABEL = { win: '🏆 VICTOIRE !', draw: '🤝 MATCH NUL', loss: '💪 DÉFAITE… REVANCHE DEMAIN !' };
+export const OUTCOME_LABEL = { win: '🏆 VICTOIRE !', draw: '🤝 MATCH NUL', loss: '💪 DÉFAITE… REVANCHE AU PROCHAIN MATCH !' };
 
 export function recordMatch(profile, goalsFor, goalsAgainst, opponent) {
     const outcome = matchOutcome(goalsFor, goalsAgainst);

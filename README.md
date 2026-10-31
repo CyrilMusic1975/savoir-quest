@@ -14,7 +14,7 @@ C'est une **PWA** (site installable sur l'écran d'accueil, qui fonctionne hors 
 | Révision | Mission du jour (toutes matières), entraînement par matière, carnet d'erreurs, reprise d'une séance interrompue |
 | Exercices | QCM, saisie de réponse, toucher les mots d'une phrase, remise en ordre, association, figures de géométrie (SVG) |
 | Adaptation | Répétition espacée (1, 3, 7, 14, 30 jours), niveaux 1 à 3, suivi des cas précis ratés (une table de multiplication, un rang décimal, un verbe…), réussites lentes détectées |
-| Motivation | Match du jour (score contre un adversaire fictif), saison hebdomadaire (Bronze → Champion), records, badges et cartes de joueur par compétence, série de jours, récompenses de paliers d'XP |
+| Motivation | Mascotte Kiko, championnat à 10 équipes (une mission = un match, 18 journées aller-retour, classement visible à l'accueil et en fin de mission), saison hebdomadaire (Bronze → Champion), records, badges et cartes de joueur par compétence, série de jours, récompenses de paliers d'XP |
 | Rappel | Notification quotidienne à 17 h 30 si le profil n'a pas encore joué |
 | Suivi parent | Envoi automatique des résultats vers Firebase, tableau de bord web et bilan hebdomadaire en Markdown |
 | Robustesse | Hors ligne, sauvegarde/restauration de la progression en fichier, profils multiples, mises à jour automatiques |
