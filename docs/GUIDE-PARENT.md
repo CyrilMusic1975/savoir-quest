@@ -20,11 +20,14 @@ L'application fonctionne ensuite **sans connexion**. Les mises à jour arrivent 
 
 | Écran | À quoi ça sert |
 |---|---|
-| **Mission du jour** | Match de 10 questions : une bonne réponse est un but, une erreur est un but adverse |
+| **Mission du jour** | Match de 10 questions : une bonne réponse est un but, une erreur est un but adverse. **Chaque mission est une journée du championnat** |
+| **Championnat** (carte de l'accueil) | Classement de 10 équipes (Kiko FC et 9 équipes fictives), 18 journées aller-retour ; sa place est affichée en grand à l'accueil et en fin de mission |
 | **Choisir une matière** | S'entraîner sur une matière précise |
 | **Mes erreurs** | Reprendre ce qu'il a raté |
 | **Ma collection** | Cartes de joueur, badges, records, matchs, saisons |
 | **Réglages et sauvegarde** | Chrono, sons, sauvegarde de la progression |
+
+**Kiko**, la mascotte, accompagne chaque mission : il encourage, donne un conseil de réflexion à chaque question et rassure après une erreur. Sur certaines questions (décimaux, rangs, zéros facultatifs, géométrie), une première erreur ne révèle pas la réponse : Kiko donne un **coup de pouce** et l'enfant réessaie une fois (un but et 50 points s'il réussit). Chaque jour, sur l'accueil, Kiko explique un objectif (match, championnat, XP, ligues, cartes, records, série de jours). On peut le masquer dans « Réglages et sauvegarde ».
 
 La **série de jours** et la **saison** de la semaine (Bronze → Champion) l'encouragent à revenir un peu chaque jour. Perdre un match n'enlève aucun point.
 

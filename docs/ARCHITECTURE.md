@@ -26,7 +26,7 @@ L'application fonctionne **entièrement sans le cloud** : la progression vit dan
 | `engine.js` | Construit les séances, enregistre les réponses (maîtrise, répétition espacée, badges, cas précis) | `content`, `state` |
 | `progress.js` | Saison, match, records, cartes de joueur (calculs purs, sans interface) | `state` |
 | `championnat.js` | Championnat à 10 équipes : calendrier, simulation, classement (calculs purs) | `progress` |
-| `kiko.js` | Phrases de la mascotte Kiko et choix de l'événement (pur) | — |
+| `kiko.js` | Mascotte Kiko : phrases, règle de seconde chance (`canRetry`), explications des objectifs (`TIPS`, `nextTip`) — pur | — |
 | `render.js` | Affiche chaque type de question et appelle `submit(correct, réponse)` | `content/helpers` |
 | `state.js` | Lecture/écriture des profils, réglages et séance en cours dans `localStorage` ; dates et semaines | — |
 | `sync.js` | Authentification anonyme, file d'attente locale, envoi par lots vers Firestore (REST) | — |
@@ -64,8 +64,9 @@ Stocké sous la clé `mathQuest_profiles` (liste de profils). Les champs absents
 | `champ`, `champHistory[]` | Saison de championnat en cours (scores de l'élève) et saisons terminées (rang, points) |
 | `season`, `seasons[]`, `pendingSeasonReview` | Saison en cours (semaine ISO, XP), historique, bilan à afficher |
 | `daily{streak,last}` | Série de jours consécutifs |
+| `kikoTips[]`, `kikoTipDay` | Explications d'objectifs déjà vues et jour de la dernière (une par jour) |
 
-Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono, sons), `sq_session_<profil>` (séance à reprendre), `sq_sync` (jeton et file d'envoi), `sq_push_sub` (abonnement aux notifications), `sq_reminder_dismissed`.
+Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono, sons, Kiko), `sq_session_<profil>` (séance à reprendre), `sq_sync` (jeton et file d'envoi), `sq_push_sub` (abonnement aux notifications), `sq_reminder_dismissed`.
 
 ## Déroulement d'une séance (`buildSession`)
 
@@ -74,6 +75,12 @@ Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono
 3. **Cas précis** : avant chaque séance, `weakFacets` liste les facettes ratées (au moins 2 essais, moins de 60 % de réussite). Les générateurs concernés les proposent environ une fois sur deux.
 4. **Questions de banque** : niveau limité au niveau débloqué ; les nouvelles questions sont préférées (70 %).
 5. **Entraînement par matière** (`subject`) et **carnet d'erreurs** (`errors`) suivent le même principe, restreints.
+
+## Kiko et la seconde chance (`kiko.js`, `main.js`, `render.js`)
+
+- **Mascotte** : image `img/kiko.png` et bulle sur l'écran de jeu ; la phrase est choisie par rotation (sans hasard, donc testable) selon l'événement : début, conseil, bonne réponse, série, seconde chance, erreur. Réglage « Kiko, la mascotte » (`sq_settings.kiko`, activé par défaut).
+- **Seconde chance** : une question ayant un champ `hint` (voir `withHint` dans [CONTENU.md](CONTENU.md)), de type `qcm` à 3 options ou plus ou `input`, ne révèle pas la bonne réponse à la première erreur (`renderQuestion(..., { reveal: false })`). La première erreur est enregistrée normalement (`recordAnswer`, événement envoyé). Kiko affiche le coup de pouce, l'option ratée est écartée (`excluded`) et l'élève réessaie une fois : un but et 50 points s'il réussit (ni série ni badge, aucun second événement), sinon but adverse et explication complète. Rien de nouveau n'est envoyé à Firebase.
+- **Explications des objectifs** : sur l'accueil, une explication de `TIPS` par jour, dans l'ordre, jusqu'à ce que les sept soient vues.
 
 ## Enregistrement d'une réponse (`recordAnswer`)
 

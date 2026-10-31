@@ -31,6 +31,10 @@ python3 -m http.server 8123   # serveur local (les modules JS ne marchent pas en
 - Sur `localhost`, `js/sync.js` n'envoie **rien** (sauf `?sync=1`) : ne pas s'en étonner en testant. Si tu testes l'envoi, **supprime ensuite tes données d'essai** de Firestore (`events`, `backups`, `push`), après avoir vérifié qu'aucun vrai profil n'y figure.
 - La sauvegarde (`backups`) est limitée à 750 000 caractères côté application et 800 000 côté règles ; si les profils grossissent, élaguer `missed`, `matches` ou `srs` dans `ensureProfile`.
 
+- Chaque mission est un match de championnat (`js/championnat.js`) : le classement se **recalcule** à partir des seuls scores de l'élève et de l'identifiant du profil. Ne change pas la simulation (force, graine, calendrier) en cours de saison : les classements déjà vus changeraient.
+- Un coup de pouce (`withHint`) ne doit jamais contenir la réponse (test de contenu) ; la seconde chance ne fonctionne que pour `qcm` à 3 options ou plus et `input`.
+- L'image de Kiko (`img/kiko.png`) doit rester listée dans `FILES` de `sw.js`, comme tout nouveau fichier JS.
+
 ## Éléments hors de ce dépôt
 
 - `~/Desktop/SavoirQuest-suivi` (dépôt privé `savoir-quest-suivi`) : règles Firestore, tableau de bord parent, hébergement Firebase (projet `savoir-quest-suivi`). Toujours passer `--project savoir-quest-suivi` aux commandes `firebase`.

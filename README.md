@@ -27,10 +27,13 @@ style.css             Styles (mobile d'abord)
 sw.js                 Service worker : cache hors ligne, notifications push
 manifest.webmanifest  Métadonnées d'installation (nom, icônes, couleurs)
 icons/                Icônes de l'application
+img/                  Images de l'application (Kiko, la mascotte)
 js/
   main.js             Interface et déroulement d'une mission
   engine.js           Composition des séances, répétition espacée, badges, suivi des cas précis
-  progress.js         Match du jour, saison, records, cartes de joueur
+  progress.js         Match, saison hebdomadaire, records, cartes de joueur
+  championnat.js      Championnat à 10 équipes : calendrier, simulation, classement
+  kiko.js             Mascotte Kiko : phrases, seconde chance, explications des objectifs
   render.js           Affichage des questions (un rendu par type d'exercice)
   state.js            Profils et réglages dans le navigateur (localStorage)
   sync.js             Envoi des résultats vers Firebase (API REST, file hors ligne)

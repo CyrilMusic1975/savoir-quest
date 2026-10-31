@@ -11,11 +11,13 @@ Ils se lancent aussi automatiquement à **chaque publication** sur la branche `m
 
 | Fichier | Vérifie |
 |---|---|
-| `content.test.mjs` | Cohérence de **toutes les questions de banque** : identifiants uniques, énoncé et explication présents, niveau valide, bonne réponse présente dans les options, pas d'options en double, éléments à ordonner et paires d'association distincts, indices de mots valides |
+| `content.test.mjs` | Cohérence de **toutes les questions de banque** (y compris les coups de pouce : 15 à 160 caractères, jamais la réponse, seconde chance possible) et formulation des décimaux (plus de « s'arrête ») : identifiants uniques, énoncé et explication présents, niveau valide, bonne réponse présente dans les options, pas d'options en double, éléments à ordonner et paires d'association distincts, indices de mots valides |
 | `generators.test.mjs` | Générateurs de maths d'origine : quatre réponses distinctes et justes, pas de nombres égaux ou de fractions équivalentes dans les choix, calcul exact (priorités, division euclidienne, pourcentages, durées…) |
 | `generators6e.test.mjs` | Décimaux, géométrie, histoire et anglais : **chaque réponse est recalculée de façon indépendante** (zéros facultatifs, partie entière, construction d'un nombre, fractions décimales, appartenance ∈/∉, nombre de noms d'une droite, chiffres romains, siècles, frise, nombres et ordinaux anglais) |
 | `conjugaison.test.mjs` | Environ 250 formes verbales écrites à la main, comparées au moteur ; puis les questions générées : élision, accord avec être, absence d'ambiguïté sur le temps ou l'infinitif demandé |
 | `engine.test.mjs` | 300 missions simulées : 10 questions valides, toutes les matières proposées, séances par matière, badges attribués, une réussite lente n'avance pas la répétition espacée, une erreur est marquée « à revoir » |
+| `kiko.test.mjs` | Phrases de Kiko (3 au moins par événement, sans doublon, rotation complète, ton), règle de seconde chance, ordre et rythme des explications d'objectifs (une par jour, jamais deux fois la même) |
+| `championnat.test.mjs` | Calendrier à 10 équipes (chaque équipe joue à chaque journée, chaque rencontre une fois à domicile et une fois à l'extérieur), simulation reproductible, **classement recalculé de façon indépendante** (points, buts, tri), prochain adversaire, fin et archivage de saison |
 | `progress.test.mjs` | Ligues, semaines ISO (dont le passage d'année), archivage de saison, match, records (le premier record est silencieux), notes des cartes |
 
 ## Principe

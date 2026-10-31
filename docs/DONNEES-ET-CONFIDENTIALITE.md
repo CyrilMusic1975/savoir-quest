@@ -6,6 +6,8 @@ L'application est destinée à un **enfant mineur**. Le principe retenu : collec
 
 Toute la progression (profils, points, badges, erreurs, séance en cours) est stockée dans le navigateur (`localStorage`). Rien n'est nécessaire côté serveur pour jouer. Le bouton « Sauvegarder » exporte un fichier JSON ; « Restaurer » le réimporte (fusion en gardant le profil qui a le plus de points).
 
+Le championnat (scores des journées, saisons terminées), les explications de Kiko déjà vues et le réglage de la mascotte restent sur le téléphone ; ils ne sont envoyés qu'au sein de la sauvegarde automatique de la progression (voir ci-dessous). La seconde chance n'envoie qu'un événement par question : celui de la première réponse.
+
 ## Ce qui est envoyé au parent
 
 À chaque réponse, un événement est envoyé à un projet Firebase **dédié** (base Firestore hébergée dans l'Union européenne, zone `eur3`) :
