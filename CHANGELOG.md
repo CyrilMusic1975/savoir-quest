@@ -2,6 +2,10 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v20 — Question sur l'association « décimal » / « nombre à virgule »
+- Nouvelle question `dec_d13` : repérer le nombre décimal qui n'est pas entier parmi 7,0 (égal à un entier), 4,333… (ne s'arrête pas), 12 et 4,25. Elle montre si l'élève confond « décimal » et « écrit avec une virgule ».
+- Nouveau contrôle : la bonne réponse est recalculée de façon indépendante (écriture qui s'arrête, partie décimale non nulle).
+
 ## v19 — Aide visuelle pour les soustractions de décimaux
 - Sur chaque soustraction de décimaux, des cases (0,40 ; 0,05 ; 0,10…) s'affichent d'emblée : en les touchant, l'élève retire le nombre par morceaux et voit le total évoluer. Il saisit lui-même la réponse.
 - Nouveau contrôle : l'aide est recalculée de façon indépendante (départ, nombre à retirer, cases suffisantes).

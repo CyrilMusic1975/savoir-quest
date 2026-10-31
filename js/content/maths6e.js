@@ -252,7 +252,8 @@ const decDef = [
     qcm('dec_d09', 'Lequel de ces nombres n\'est pas un nombre décimal ?', '0,333…', ['0,333', '5,1', '18,48'], 'Dans 0,333… les 3 se répètent sans jamais s\'arrêter : la partie décimale ne s\'arrête pas.', 2),
     qcm('dec_d10', 'La calculatrice affiche 100 ÷ 3 = 33,333333… Le résultat est-il un nombre décimal ?', 'Non : les 3 ne s\'arrêtent jamais', ['Oui, car il y a une virgule', 'Oui, car il s\'écrit avec des chiffres', 'Non, car c\'est un nombre entier'], 'Avoir une virgule ne suffit pas : une écriture décimale doit « s\'arrêter ». 33,333… ne s\'arrête jamais.', 3),
     qcm('dec_d11', '7/10 est-il un nombre décimal ?', 'Oui, c\'est 0,7', ['Non, c\'est une fraction', 'Non, car 7 ÷ 10 ne s\'arrête pas', 'Oui, c\'est 7,10'], 'Une fraction décimale (dénominateur 10, 100, 1000…) est un nombre décimal : 7/10 = 0,7.', 2),
-    qcm('dec_d12', '10/7 est-il un nombre décimal ?', 'Non : 10 ÷ 7 = 1,428571… ne s\'arrête jamais', ['Oui, c\'est 1,4', 'Oui, c\'est 10,7', 'Oui, c\'est 1,43'], 'Quand on divise 10 par 7, la partie décimale ne s\'arrête jamais : ce n\'est pas un nombre décimal.', 3)
+    qcm('dec_d12', '10/7 est-il un nombre décimal ?', 'Non : 10 ÷ 7 = 1,428571… ne s\'arrête jamais', ['Oui, c\'est 1,4', 'Oui, c\'est 10,7', 'Oui, c\'est 1,43'], 'Quand on divise 10 par 7, la partie décimale ne s\'arrête jamais : ce n\'est pas un nombre décimal.', 3),
+    qcm('dec_d13', 'Lequel de ces nombres est un nombre décimal qui n\'est pas un nombre entier ?', '4,25', ['7,0', '4,333…', '12'], 'Un nombre décimal non entier a une partie décimale qui s\'arrête et qui ne vaut pas 0 : 4,25. Avoir une virgule ne suffit pas : 7,0 est égal à l\'entier 7, et 4,333… ne s\'arrête jamais. Quant à 12, il est décimal (12 = 12,0) mais c\'est aussi un entier.', 2)
 ];
 
 const decZerosCours = [

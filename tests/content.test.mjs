@@ -38,5 +38,13 @@ export function run(fail) {
             } else fail(`${at} : type inconnu « ${kind} »`);
         }
     }
+    // dec_d13 : recalcul indépendant (écriture qui s'arrête ET partie décimale non nulle)
+    const d13 = SKILLS.flatMap(s => s.bank || []).find(q => q.id === 'dec_d13');
+    if (!d13) fail('dec_d13 introuvable');
+    else {
+        const nonEntierDecimal = t => /^\d+,\d+$/.test(t) && !/^\d+,0+$/.test(t);
+        const bonnes = d13.options.filter(nonEntierDecimal);
+        if (bonnes.length !== 1 || bonnes[0] !== d13.answer) fail(`dec_d13 : la bonne réponse attendue est « ${bonnes.join(' / ')} », pas « ${d13.answer} »`);
+    }
     return `${SKILLS.length} compétences, ${qIds.size} questions de banque`;
 }
