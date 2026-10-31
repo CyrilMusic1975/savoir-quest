@@ -138,22 +138,23 @@ const sameAnswer = (a, b) => {
 };
 
 // --- Interaction : chaque type appelle submit(correct) une seule fois ---
-function renderQcm(q, box, submit) {
+function renderQcm(q, box, submit, opts) {
     const symbolic = q.options.every(o => o.length <= 2); // =, ≠, ∈, ∉ : gros boutons
     q.options.forEach(opt => {
         const btn = el('button', `btn btn-option animate-pop${symbolic ? ' btn-symbol' : ''}`, opt);
+        if (opt === opts.excluded) { btn.disabled = true; btn.classList.add('wrong'); } // essai déjà raté : écarté à la seconde chance
         btn.onclick = () => {
             box.querySelectorAll('button').forEach(b => { b.disabled = true; });
             const ok = opt === q.answer;
             btn.classList.add(ok ? 'correct' : 'wrong');
-            if (!ok) box.querySelectorAll('button').forEach(b => { if (b.textContent === q.answer) b.classList.add('correct'); });
+            if (!ok && opts.reveal) box.querySelectorAll('button').forEach(b => { if (b.textContent === q.answer) b.classList.add('correct'); });
             submit(ok, opt);
         };
         box.appendChild(btn);
     });
 }
 
-function renderInput(q, box, submit) {
+function renderInput(q, box, submit, opts) {
     const wrap = el('div', 'input-wrap');
     const input = el('input', 'answer-input');
     input.type = 'text';
@@ -175,7 +176,7 @@ function renderInput(q, box, submit) {
         btn.disabled = true;
         const ok = (q.accept || [q.answer]).some(a => sameAnswer(input.value, a));
         input.classList.add(ok ? 'correct' : 'wrong');
-        if (!ok) result.textContent = `Réponse attendue : ${q.answer}`;
+        if (!ok && opts.reveal) result.textContent = `Réponse attendue : ${q.answer}`;
         submit(ok, input.value.trim());
     };
     btn.onclick = check;
@@ -342,9 +343,10 @@ function renderFlash(q, box, submit) {
 
 const RENDERERS = { qcm: renderQcm, input: renderInput, tap: renderTap, order: renderOrder, match: renderMatch, flash: renderFlash };
 
-export function renderQuestion(q, { visualArea, optionsBox }, submit) {
+// opts.reveal : montrer la bonne réponse après une erreur (faux au premier essai d'une question à coup de pouce) ; opts.excluded : option déjà ratée
+export function renderQuestion(q, { visualArea, optionsBox }, submit, opts = {}) {
     renderVisual(q, visualArea);
     optionsBox.innerHTML = '';
     optionsBox.classList.toggle('options-grid', (q.kind || 'qcm') === 'qcm');
-    (RENDERERS[q.kind || 'qcm'] || renderQcm)(q, optionsBox, submit);
+    (RENDERERS[q.kind || 'qcm'] || renderQcm)(q, optionsBox, submit, { reveal: true, ...opts });
 }

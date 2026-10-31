@@ -6,7 +6,7 @@ import * as Sync from './sync.js';
 import * as Push from './push.js';
 import * as P from './progress.js';
 import * as C from './championnat.js';
-import { kikoSays, onQuestion, onResult } from './kiko.js';
+import { kikoSays, onQuestion, onResult, canRetry } from './kiko.js';
 
 const $ = id => document.getElementById(id);
 const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), champ: $('champ-screen'), game: $('game-screen'), end: $('end-screen') };
@@ -20,6 +20,7 @@ const levelTitle = $('level-title');
 const feedback = $('feedback');
 const streakBadge = $('streak-badge');
 const explanationBox = $('explanation-box');
+const hintBox = $('hint-box');
 const explanationText = $('explanation-text');
 
 // Séance en cours
@@ -416,7 +417,9 @@ function kikoSay(event, mood) {
 function nextQuestion() {
     if (game.index >= game.questions.length) { endGame(); return; }
     game.locked = false;
+    game.retry = false;
     explanationBox.classList.add('hidden');
+    hintBox.classList.add('hidden');
     const q = game.questions[game.index];
     questionText.textContent = q.text;
     levelTitle.textContent = q.label || (q.type ? q.type.toUpperCase() : 'Mission');
@@ -431,13 +434,14 @@ function nextQuestion() {
     persistSession();
     kikoSay(onQuestion(game.index));
     game.qStart = Date.now();
-    renderQuestion(q, { visualArea, optionsBox }, onAnswer);
+    renderQuestion(q, { visualArea, optionsBox }, onAnswer, { reveal: !canRetry(q) });
 }
 
 function onAnswer(correct, given) {
     if (game.locked) return;
     game.locked = true;
     const q = game.questions[game.index];
+    if (game.retry) { finishRetry(correct, q); return; }
     const p = S.currentProfile();
     const ms = game.qStart ? Math.min(120000, Date.now() - game.qStart) : undefined;
     const badge = recordAnswer(p, q, correct, ms);
@@ -462,19 +466,56 @@ function onAnswer(correct, given) {
         S.saveProfiles();
         kikoSay(onResult(true, game.streak), 'jump');
         setTimeout(() => { game.index++; nextQuestion(); }, 1500);
+    } else if (canRetry(q)) {
+        startRetry(q, given);
     } else {
-        game.streak = 0;
-        game.against++;
-        playSound(150, 'sawtooth', 0.3);
-        showFeedback('🥅 BUT ADVERSE');
-        updateBoard();
-        S.saveProfiles();
-        stopTimer();
-        kikoSay(onResult(false, 0), 'tilt');
-        explanationBox.classList.remove('hidden');
-        explanationText.textContent = q.explanation || 'Prends ton temps pour relire ! Sers-toi de ton brouillon au besoin.';
-        explanationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        concede(q);
     }
+}
+
+// Seconde chance : Kiko donne un coup de pouce (sans la réponse), l'élève réessaie une fois
+function startRetry(q, given) {
+    game.retry = true;
+    game.streak = 0;
+    S.saveProfiles();
+    kikoSay('retry', 'tilt');
+    $('hint-text').textContent = q.hint;
+    hintBox.classList.remove('hidden');
+    setTimeout(() => {
+        game.locked = false;
+        renderQuestion(q, { visualArea, optionsBox }, onAnswer, { reveal: true, excluded: given });
+    }, 900);
+}
+
+// Résultat du second essai : un but (sans points de série ni badge) ou un but adverse avec l'explication
+function finishRetry(correct, q) {
+    game.retry = false;
+    hintBox.classList.add('hidden');
+    if (!correct) { concede(q); return; }
+    game.correct++;
+    game.score += 50;
+    showFeedback('⚽ BUT !');
+    updateBoard();
+    playSound(440, 'triangle', 0.2);
+    scoreDisplay.textContent = `Score: ${game.score}`;
+    S.saveProfiles();
+    kikoSay('retryok', 'jump');
+    setTimeout(() => { game.index++; nextQuestion(); }, 1500);
+}
+
+// Échec définitif sur la question : but adverse et explication
+function concede(q) {
+    game.streak = 0;
+    game.against++;
+    playSound(150, 'sawtooth', 0.3);
+    showFeedback('🥅 BUT ADVERSE');
+    updateBoard();
+    S.saveProfiles();
+    stopTimer();
+    kikoSay(onResult(false, 0), 'tilt');
+    explanationBox.classList.remove('hidden');
+    explanationText.textContent = q.explanation || 'Prends ton temps pour relire ! Sers-toi de ton brouillon au besoin.';
+    explanationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 $('continue-btn').addEventListener('click', () => {

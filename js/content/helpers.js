@@ -61,5 +61,7 @@ export const input = (id, text, answer, explanation, accept = [], level = 1, num
     ({ id, kind: 'input', text, answer, accept: [answer, ...accept], numeric, explanation, level });
 export const tap = (id, text, sentence, answerWords, explanation, level = 1) =>
     ({ id, kind: 'tap', text, tokens: sentence.split(' '), answerIdx: answerWords, answer: answerWords.map(i => sentence.split(' ')[i]).join(' '), explanation, level });
+// Coup de pouce de Kiko : une piste (sans la réponse) montrée avant la seconde chance
+export const withHint = (q, hint) => ({ ...q, hint });
 export const flash = (id, front, back, level = 1) =>
     ({ id, kind: 'flash', text: front, answer: back, explanation: back, level });

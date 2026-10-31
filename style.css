@@ -788,3 +788,7 @@ p {
 .champ-move { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
 .champ-move.up { color: var(--success); } .champ-move.down { color: #fca5a5; } .champ-move.same { color: var(--text-muted); }
 .champ-row-head span:nth-child(2) { text-align: left; }
+
+/* Seconde chance : coup de pouce de Kiko */
+.hint-box { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 1rem; background: rgba(34,211,238,0.1); border: 2px solid var(--accent); }
+.hint-box .explanation-header { color: var(--accent); }

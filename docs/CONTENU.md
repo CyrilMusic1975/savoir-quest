@@ -55,6 +55,10 @@ Les constructeurs sont dans `js/content/helpers.js`.
 6. **Niveau** : 1 par défaut ; 2 et 3 pour les questions plus difficiles. Un niveau supérieur se débloque à 8 bonnes réponses sur 10.
 7. **Texte** : français soigné, apostrophes droites ou typographiques, guillemets « … ». Pas de nom d'élève ni de donnée personnelle.
 
+### Coup de pouce (seconde chance)
+
+`withHint(question, 'piste')` (dans `helpers.js`) ajoute un coup de pouce à un QCM de 3 options ou plus, ou à une saisie. Après une première erreur, la bonne réponse n'est pas montrée : Kiko affiche la piste et l'élève réessaie une fois. La piste aide à réfléchir (une question, un rappel de règle) **sans contenir la réponse** ; le test de contenu le vérifie.
+
 ### Comment une saisie est corrigée
 
 La réponse saisie est comparée sans tenir compte des majuscules, des espaces en trop et du type d'apostrophe. Pour les nombres (`numérique`), `0,5`, `0.5` et `0,50` sont équivalents. Les **accents comptent** ; ajoute les variantes acceptées dans la liste `acceptées`.

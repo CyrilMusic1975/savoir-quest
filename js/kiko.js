@@ -25,6 +25,16 @@ export const PHRASES = {
         'Impossible de t’arrêter, bravo !',
         'Enchaînement parfait !'
     ],
+    retry: [
+        'Pas encore ! Lis mon coup de pouce et réessaie.',
+        'Presque ! Regarde mon indice, tu peux y arriver.',
+        'Tu as une seconde chance : réfléchis avec mon indice !'
+    ],
+    retryok: [
+        'Bravo, tu l\'as trouvé en réfléchissant !',
+        'Voilà ! Avec un peu d\'aide, tu y es arrivé.',
+        'Bien joué, tu as su rebondir !'
+    ],
     wrong: [
         'Pas grave, on apprend de ses erreurs. Lis bien l’explication.',
         'Aïe ! Regarde l’explication, tu l’auras la prochaine fois.',
@@ -40,5 +50,7 @@ export function kikoSays(event, n = 0) {
 
 // Événement à annoncer quand la question suivante s'affiche
 export const onQuestion = index => (index === 0 ? 'start' : 'think');
+// Seconde chance : une question peut en avoir une si elle a un coup de pouce, au moins 3 options (qcm) ou une saisie
+export const canRetry = q => !!q.hint && (q.kind === 'input' || ((q.kind || 'qcm') === 'qcm' && q.options.length >= 3));
 // Événement après une réponse
 export const onResult = (correct, streak) => (!correct ? 'wrong' : streak >= 3 ? 'streak' : 'correct');

@@ -2,6 +2,13 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v23 — Seconde chance avec un coup de pouce de Kiko
+- Quand l'élève se trompe sur une question qui a un coup de pouce (champ `hint`), la bonne réponse n'est pas révélée : Kiko donne une piste, l'option ratée est écartée et l'élève réessaie une fois.
+- Second essai juste : un but pour l'élève et 50 points (ni série ni badge). Second essai raté : but adverse et explication complète, comme avant.
+- La première erreur reste enregistrée dans le suivi, les erreurs à revoir et le bilan du lundi ; le second essai n'est pas envoyé (aucun nouveau champ Firebase).
+- Les coups de pouce sont écrits pour les questions à 3 options ou plus sur les décimaux (`dec_d01`, `d02`, `d09` à `d13`). Les vrai/faux, les remises en ordre et les associations n'ont pas de seconde chance.
+- Nouveaux contrôles : un coup de pouce doit faire 15 à 160 caractères, ne pas contenir la réponse et être utilisable (saisie ou au moins 3 options) ; règle de seconde chance testée.
+
 ## v22 — Championnat à 10 équipes
 - Chaque mission est désormais un match de championnat : 10 équipes (Kiko FC et 9 équipes fictives), 18 journées aller-retour, victoire 3 points, nul 1. Plus de « mission du jour » seule : toutes les missions comptent.
 - La place de l'équipe est bien visible : grande carte « 8e sur 10 » sur l'accueil (avec le podium), classement complet en fin de mission avec la ligne de Kiko FC en évidence et la flèche de progression, écran dédié avec l'historique des saisons.

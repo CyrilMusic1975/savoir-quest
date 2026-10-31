@@ -1,5 +1,6 @@
 // Vérifie la cohérence de toutes les questions de banque (ajout de contenu = à relancer)
 import { SKILLS, SUBJECTS } from '../js/content/index.js';
+import { canRetry } from '../js/kiko.js';
 
 export function run(fail) {
     const subjects = new Set(SUBJECTS.map(s => s.id));
@@ -19,6 +20,11 @@ export function run(fail) {
             if (!q.text) fail(`${at} : énoncé manquant`);
             if (!q.explanation) fail(`${at} : explication manquante`);
             if (![1, 2, 3].includes(q.level)) fail(`${at} : niveau invalide`);
+            if (q.hint !== undefined) {
+                if (typeof q.hint !== 'string' || q.hint.length < 15 || q.hint.length > 160) fail(`${at} : coup de pouce de 15 à 160 caractères attendu`);
+                if (!canRetry(q)) fail(`${at} : coup de pouce inutilisable (il faut une saisie ou au moins 3 options)`);
+                else if (q.hint.toLowerCase().includes(String(q.answer).toLowerCase())) fail(`${at} : le coup de pouce donne la réponse`);
+            }
             const kind = q.kind || 'qcm';
             if (kind === 'qcm') {
                 if (!Array.isArray(q.options) || q.options.length < 2) fail(`${at} : moins de 2 options`);
