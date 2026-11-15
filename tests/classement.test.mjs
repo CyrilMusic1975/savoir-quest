@@ -1,5 +1,5 @@
 // Classement des joueurs : pseudo, score, rang recalculé indépendamment, requête et lecture Firestore
-import { PSEUDO_MAX, TOP, cleanPseudo, suggestPseudos, scoreOf, docId, rankRows, boardQuery, fromFirestoreRows } from '../js/classement.js';
+import { PSEUDO_MAX, TOP, boardMessage, gapText, cleanPseudo, suggestPseudos, scoreOf, docId, rankRows, boardQuery, fromFirestoreRows } from '../js/classement.js';
 import { ensureProfile } from '../js/state.js';
 
 export function run(fail) {
@@ -57,6 +57,30 @@ export function run(fail) {
         { readTime: 'y' }
     ];
     eq(fromFirestoreRows(resp), [{ id: 'abc_p1', pseudo: 'Zed', avatar: '🦊', weekXP: 120, totalXP: 900 }], 'lecture runQuery');
+
+    // pseudo : contournements Unicode et pseudo invisible
+    for (const bad of ['ｍｅｒｄｅ', 'm\u0435rde', '\u200d\u200d', '\ufe0f\ufe0f', '- -', "''"]) {
+        if (cleanPseudo(bad).ok) fail(`pseudo « ${JSON.stringify(bad)} » aurait dû être refusé`);
+    }
+    if (!cleanPseudo('🦊 Zed').ok) fail('un pseudo avec lettres et émoji doit rester possible');
+
+    // écart : dans le top, en tête, hors du top 50
+    const big = Array.from({ length: TOP + 5 }, (_, i) => ({ id: 'b' + i, pseudo: 'J' + i, avatar: '', weekXP: 1000 - i * 10, totalXP: 1000 - i * 10 }));
+    const rb = id => rankRows(big, 'week', id).list;
+    eq(gapText(rb('b0'), 'week'), '🏆 Tu es en tête !', 'texte du premier');
+    eq(gapText(rb('b3'), 'week'), 'Il te manque 10 points pour rejoindre J2.', 'texte dans le top');
+    eq(gapText(rb('b' + (TOP + 2)), 'week'), `Il te manque ${(TOP + 2 - (TOP - 1)) * 10} points pour rejoindre le top ${TOP}.`, 'texte hors du top 50 (écart au dernier du top)');
+    eq(gapText(rankRows(big.slice(0, 3), 'week', 'inconnu').list, 'week'), '', 'sans joueur');
+
+    // messages du classement
+    const zero = rankRows([{ id: 'm', pseudo: 'Moi', avatar: '', weekXP: 0, totalXP: 40 }], 'week', 'm').list;
+    const some = rankRows([{ id: 'm', pseudo: 'Moi', avatar: '', weekXP: 30, totalXP: 40 }], 'week', 'm').list;
+    eq(boardMessage(null, 'week', zero), 'Classement indisponible pour l\'instant.', 'message : rien de disponible');
+    eq(boardMessage({ rows: [], fromCache: true, reason: 'offline' }, 'week', some), 'Hors ligne : dernier classement connu.', 'message : hors ligne');
+    eq(boardMessage({ rows: [], fromCache: true, reason: 'server' }, 'week', some), 'Classement momentanément indisponible : dernier classement connu.', 'message : erreur du serveur');
+    eq(boardMessage({ rows: [], fromCache: false }, 'week', zero), 'Personne n\'a encore joué cette semaine. Sois le premier !', 'message : semaine vide');
+    eq(boardMessage({ rows: [], fromCache: false }, 'week', some), '', 'semaine vide côté serveur mais le joueur a joué : pas de message');
+    eq(boardMessage({ rows: [], fromCache: false }, 'total', zero), '', 'onglet Total : pas de message de semaine vide');
 
     // profil
     eq(ensureProfile({}).board, { pseudo: null }, 'champ board par défaut');

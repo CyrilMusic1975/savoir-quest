@@ -177,11 +177,12 @@ function writeBoardCache(tab, entry) {
     try { localStorage.setItem(BOARD_KEY, JSON.stringify({ ...JSON.parse(localStorage.getItem(BOARD_KEY) || '{}'), [tab]: entry })); } catch (e) { /* ignoré */ }
 }
 
-// Retourne { rows, fromCache } ou null si rien n'est disponible
+// Retourne { rows, fromCache, reason } (reason : 'offline' ou 'server' quand on affiche le cache) ou null si rien n'est disponible
 export async function fetchBoard(tab, week) {
     const cached = readBoardCache(tab);
-    const fallback = () => (cached && cached.week === week ? { rows: cached.rows, fromCache: true } : null);
-    if (DEV || !navigator.onLine) return fallback();
+    // le classement Total reste valable d'une semaine à l'autre ; celui de la semaine non
+    const fallback = reason => (cached && (tab === 'total' || cached.week === week) ? { rows: cached.rows, fromCache: true, reason } : null);
+    if (DEV || !navigator.onLine) return fallback('offline');
     try {
         const idToken = await token();
         const res = await fetch(`${DOCS}:runQuery`, {
@@ -189,11 +190,11 @@ export async function fetchBoard(tab, week) {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
             body: JSON.stringify(boardQuery(tab, week))
         });
-        if (!res.ok) { if (res.status === 401) { state.idToken = null; save(); } return fallback(); }
+        if (!res.ok) { if (res.status === 401) { state.idToken = null; save(); } return fallback('server'); }
         const rows = fromFirestoreRows(await res.json());
         writeBoardCache(tab, { week, rows });
         return { rows, fromCache: false };
-    } catch (e) { return fallback(); }
+    } catch (e) { return fallback('offline'); }
 }
 
 export async function flush() {

@@ -2,6 +2,14 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v27 — Classement : cinq corrections
+- Le filtre de pseudo reconnaît aussi les lettres pleine chasse et les lettres cyrilliques qui imitent des lettres latines ; un pseudo sans lettre ni chiffre (par exemple des caractères invisibles) est refusé.
+- Hors du top 50, la phrase sous le classement indique les points qui manquent pour **rejoindre le top 50**, et non pour dépasser un joueur qui n'est peut-être pas celui juste devant.
+- Hors ligne, le classement **Total** en cache reste affiché d'une semaine à l'autre ; seul celui de la semaine est écarté quand la semaine change.
+- Quand le serveur répond par une erreur alors que le téléphone est en ligne, le message est « Classement momentanément indisponible : dernier classement connu », et non « Hors ligne ».
+- « Personne n'a encore joué cette semaine » ne s'affiche plus au-dessus d'un joueur qui a déjà des points cette semaine.
+- Les phrases du classement sont des fonctions pures de `js/classement.js` (`gapText`, `boardMessage`), testées.
+
 ## v26 — Classement des joueurs
 - Nouvel écran « Classement des joueurs » (carte sur l'accueil) : deux onglets, **Semaine** (XP de la semaine, remis à zéro le lundi) et **Total**. Le joueur est mis en évidence avec son rang et les points qui lui manquent pour rejoindre celui qui le précède.
 - Tout joueur de l'application apparaît automatiquement. Un **pseudo** est demandé une seule fois (suggestions proposées, filtre de mots) ; il se change dans les réglages. Le vrai nom n'est jamais publié : seulement pseudo, avatar et points.

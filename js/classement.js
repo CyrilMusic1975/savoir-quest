@@ -8,7 +8,10 @@ const BAD_LONG = ['merde', 'putain', 'salope', 'connard', 'connasse', 'encule', 
 const BAD_WORD = ['pute', 'nique', 'bite', 'con', 'cul', 'fdp', 'ntm', 'pd', 'chier', 'sexe', 'porno', 'zob', 'tg'];
 
 const LEET = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', '@': 'a', $: 's', '!': 'i' };
-const normalize = s => [...s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')].map(c => LEET[c] || c).join('');
+// Lettres cyrilliques qui ressemblent à des lettres latines
+const LOOKALIKE = { а: 'a', е: 'e', о: 'o', р: 'p', с: 'c', х: 'x', у: 'y', і: 'i', ѕ: 's', ј: 'j', к: 'k', м: 'm', н: 'h', т: 't', в: 'b' };
+// NFKD ramène les lettres pleine chasse (ｍ) et accentuées à leur forme simple
+const normalize = s => [...s.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')].map(c => LOOKALIKE[c] || LEET[c] || c).join('');
 
 function isBad(pseudo) {
     const norm = normalize(pseudo);
@@ -26,6 +29,7 @@ export function cleanPseudo(raw) {
     if (!/^[\p{L}\p{N} '’_-]+$|^[\p{L}\p{N} '’_\-\p{Extended_Pictographic}‍️]+$/u.test(pseudo)) {
         return { ok: false, pseudo, reason: 'Utilise seulement des lettres, des chiffres, des espaces ou des tirets.' };
     }
+    if (!/[\p{L}\p{N}]/u.test(pseudo)) return { ok: false, pseudo, reason: 'Ton pseudo doit contenir au moins une lettre ou un chiffre.' };
     if (isBad(pseudo)) return { ok: false, pseudo, reason: 'Choisis un autre pseudo, celui-ci n\'est pas possible.' };
     return { ok: true, pseudo };
 }
@@ -88,4 +92,25 @@ export function fromFirestoreRows(resp) {
         weekXP: num(d.fields?.weekXP),
         totalXP: num(d.fields?.totalXP)
     }));
+}
+
+// Phrase sous le classement : en tête, écart avec celui qui précède, ou écart pour entrer dans le top
+export function gapText(ranked, tab) {
+    const key = tab === 'week' ? 'weekXP' : 'totalXP';
+    const i = ranked.findIndex(r => r.me);
+    if (i < 0) return '';
+    const mine = ranked[i];
+    const ahead = ranked.filter(r => r[key] > mine[key]);
+    if (!ahead.length) return ranked.length > 1 && ranked.filter(r => r[key] === mine[key]).length === 1 ? '🏆 Tu es en tête !' : '';
+    const plural = n => `${n} point${n > 1 ? 's' : ''}`;
+    if (i >= TOP) return `Il te manque ${plural(ranked[TOP - 1][key] - mine[key])} pour rejoindre le top ${TOP}.`;
+    return `Il te manque ${plural(ahead[ahead.length - 1][key] - mine[key])} pour rejoindre ${ahead[ahead.length - 1].pseudo}.`;
+}
+
+// Message d'état au-dessus de la liste ; `res` vient de fetchBoard (null = rien de disponible)
+export function boardMessage(res, tab, ranked) {
+    if (!res) return 'Classement indisponible pour l\'instant.';
+    if (res.fromCache) return res.reason === 'server' ? 'Classement momentanément indisponible : dernier classement connu.' : 'Hors ligne : dernier classement connu.';
+    if (tab === 'week' && ranked.every(r => !r.weekXP)) return 'Personne n\'a encore joué cette semaine. Sois le premier !';
+    return '';
 }

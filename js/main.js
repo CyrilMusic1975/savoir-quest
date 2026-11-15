@@ -345,23 +345,13 @@ async function renderBoard(tab) {
     const meId = Sync.myDocId(p) || 'moi';
     const rows = (res ? res.rows : []).filter(r => r.id !== meId);
     if (p.board.pseudo) rows.push({ id: meId, pseudo: p.board.pseudo, avatar: p.avatar, ...B.scoreOf(p, week) });
-    const { list: ranked, me } = B.rankRows(rows, tab, meId);
+    const { list: ranked } = B.rankRows(rows, tab, meId);
     const shown = ranked.filter((r, i) => i < B.TOP);
     shown.forEach(r => list.appendChild(boardRow(r, String(r.rank), key)));
     const mineRow = ranked.find(r => r.me);
     if (mineRow && !shown.includes(mineRow)) list.appendChild(boardRow(mineRow, `${B.TOP}+`, key));
-    let note = '';
-    if (!res) note = 'Classement indisponible pour l\'instant.';
-    else if (res.fromCache) note = 'Hors ligne : dernier classement connu.';
-    else if (!res.rows.length && tab === 'week') note = 'Personne n\'a encore joué cette semaine. Sois le premier !';
-    $('board-note').textContent = note;
-    if (mineRow) {
-        if (me.rank === 1 && ranked.filter(r => r[key] === mineRow[key]).length === 1 && ranked.length > 1) $('board-gap').textContent = '🏆 Tu es en tête !';
-        else if (me.gap) {
-            const ahead = ranked.filter(r => r[key] > mineRow[key]).pop();
-            $('board-gap').textContent = `Il te manque ${me.gap} point${me.gap > 1 ? 's' : ''} pour rejoindre ${ahead.pseudo}.`;
-        }
-    }
+    $('board-note').textContent = B.boardMessage(res, tab, ranked);
+    $('board-gap').textContent = B.gapText(ranked, tab);
 }
 function boardRow(r, rankText, key) {
     const row = el('div', `board-row${r.me ? ' me' : ''}`);
