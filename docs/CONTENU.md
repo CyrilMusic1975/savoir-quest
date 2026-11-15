@@ -85,6 +85,7 @@ Champs d'une question (tous types) : `kind`, `text`, `explanation`, et selon le 
 - **QCM généré** : mélange les options toi-même et garantis qu'elles sont distinctes ; la fonction `mc(...)` présente dans plusieurs fichiers le fait.
 - **Cas précis (`facet`)** : un libellé court (« millièmes », « 7×8 », « aller »). Il apparaît dans le bilan. Un générateur peut aussi *cibler* les cas ratés avec `weakFacet('id_de_la_compétence')`, comme la conjugaison.
 - **Figures** : `visual: { type: 'geo', points: [...], obj: { type, from, to }, off }` pour les droites, demi-droites et segments ; `fraction`, `graduated`, `conversion-table`, `text-display` existent aussi (voir `render.js`).
+- **Aide à la soustraction de décimaux** : `visual: { type: 'decimal-sub', start, target, chips }` (valeurs en centièmes). Des cases à toucher retirent `target` de `start` par morceaux et affichent le total en cours, sans donner la réponse ; `chips` doit permettre de former exactement `target` (contrôlé par `tests/generators.test.mjs`). Utilisé par `generateDecimalOperationQuestion`, uniquement pour les soustractions.
 
 ## Ajouter une matière
 
