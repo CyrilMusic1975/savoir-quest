@@ -796,3 +796,18 @@ p {
 /* Explication d'un objectif par Kiko */
 .kiko-tip { margin: 1rem 0 0; text-align: left; align-items: flex-start; }
 .kiko-tip-ok { margin-top: 0.5rem; padding: 0.4rem 0.9rem; font-size: 0.9rem; }
+
+/* Classement des joueurs */
+.board-card { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 0.8rem; padding: 0.8rem 1rem; font: inherit; font-weight: 700; color: inherit; cursor: pointer; background: rgba(255,255,255,0.05); border: 2px solid var(--accent); border-radius: 1rem; }
+.board-tabs { display: flex; gap: 0.5rem; margin: 0.8rem 0; }
+.board-tab { flex: 1; padding: 0.6rem; font: inherit; font-weight: 700; color: inherit; cursor: pointer; background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 0.8rem; }
+.board-tab[aria-pressed="true"] { border-color: var(--accent); background: rgba(255,255,255,0.12); }
+.board-list { display: grid; gap: 0.3rem; }
+.board-row { display: grid; grid-template-columns: 2.4rem 2rem 1fr auto; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem; background: rgba(255,255,255,0.05); border-radius: 0.7rem; }
+.board-row.me { border: 2px solid var(--streak-gold); background: rgba(251,191,36,0.14); }
+.board-row .rk { font-weight: 700; text-align: center; }
+.board-row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-gap { margin-top: 0.8rem; text-align: center; font-weight: 700; }
+.pseudo-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.6rem 0; }
+.pseudo-chips button { padding: 0.35rem 0.7rem; font: inherit; color: inherit; cursor: pointer; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); border-radius: 999px; }
+.pseudo-error { min-height: 1.2rem; color: #f87171; font-size: 0.9rem; }

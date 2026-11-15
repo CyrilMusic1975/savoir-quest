@@ -6,10 +6,11 @@ import * as Sync from './sync.js';
 import * as Push from './push.js';
 import * as P from './progress.js';
 import * as C from './championnat.js';
+import * as B from './classement.js';
 import { kikoSays, onQuestion, onResult, canRetry, nextTip } from './kiko.js';
 
 const $ = id => document.getElementById(id);
-const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), champ: $('champ-screen'), game: $('game-screen'), end: $('end-screen') };
+const screens = { home: $('home-screen'), subjects: $('subject-screen'), badges: $('badges-screen'), champ: $('champ-screen'), board: $('board-screen'), game: $('game-screen'), end: $('end-screen') };
 const questionText = $('question-text');
 const optionsBox = $('options-container');
 const visualArea = $('visual-area');
@@ -140,6 +141,9 @@ function updateHome() {
     renderSeason(p);
     renderChamp(p);
     renderTip(p);
+    $('board-pseudo-status').textContent = p.board.pseudo ? `Ton pseudo : ${p.board.pseudo}` : 'Pas encore choisi.';
+    if (!p.board.pseudo) openPseudo(false);
+    else Sync.pushScore(p, S.weekId());
     const streak = currentStreak(p);
     $('streak-info').textContent = streak > 0
         ? `🔥 ${streak} jour${streak > 1 ? 's' : ''} de suite${doneToday(p) ? ' — mission du jour faite ✅' : ''}`
@@ -282,6 +286,92 @@ function renderChampScreen() {
 }
 $('champ-card').addEventListener('click', () => { renderChampScreen(); show('champ'); });
 $('champ-back-btn').addEventListener('click', () => show('home'));
+
+// ---------- Classement des joueurs ----------
+const pseudoModal = $('pseudo-modal');
+const pseudoInput = $('pseudo-input');
+let pseudoSeed = Date.now() % 100000;
+
+function openPseudo(canCancel) {
+    if (!pseudoModal.classList.contains('hidden')) return;
+    const p = S.currentProfile();
+    const chips = $('pseudo-chips');
+    chips.replaceChildren();
+    const sugg = B.suggestPseudos(pseudoSeed++);
+    sugg.forEach(s => {
+        const b = el('button', null, s);
+        b.type = 'button';
+        b.addEventListener('click', () => { pseudoInput.value = s; $('pseudo-error').textContent = ''; });
+        chips.appendChild(b);
+    });
+    pseudoInput.value = p && p.board.pseudo ? p.board.pseudo : sugg[0];
+    $('pseudo-error').textContent = '';
+    $('pseudo-cancel-btn').classList.toggle('hidden', !canCancel);
+    pseudoModal.classList.remove('hidden');
+    setTimeout(() => pseudoInput.focus(), 50);
+}
+function confirmPseudo() {
+    const p = S.currentProfile();
+    const res = B.cleanPseudo(pseudoInput.value);
+    if (!res.ok) { $('pseudo-error').textContent = res.reason; return; }
+    p.board.pseudo = res.pseudo;
+    S.saveProfiles();
+    pseudoModal.classList.add('hidden');
+    $('board-pseudo-status').textContent = `Ton pseudo : ${res.pseudo}`;
+    Sync.pushScore(p, S.weekId(), true);
+}
+$('pseudo-ok-btn').addEventListener('click', confirmPseudo);
+pseudoInput.addEventListener('keydown', e => { if (e.key === 'Enter') confirmPseudo(); });
+$('pseudo-cancel-btn').addEventListener('click', () => pseudoModal.classList.add('hidden'));
+$('board-pseudo-btn').addEventListener('click', () => { if (S.currentProfile()) openPseudo(!!S.currentProfile().board.pseudo); });
+
+let boardTab = 'week';
+let boardToken = 0;
+async function renderBoard(tab) {
+    boardTab = tab;
+    const p = S.currentProfile();
+    const week = S.weekId();
+    const mine = ++boardToken;
+    $('board-tab-week').setAttribute('aria-pressed', String(tab === 'week'));
+    $('board-tab-total').setAttribute('aria-pressed', String(tab === 'total'));
+    const list = $('board-list');
+    list.replaceChildren();
+    $('board-gap').textContent = '';
+    $('board-note').textContent = 'Chargement…';
+    if (p.board.pseudo) await Sync.pushScore(p, week);
+    const res = await Sync.fetchBoard(tab, week);
+    if (mine !== boardToken) return; // un autre onglet a été ouvert entre-temps
+    const key = tab === 'week' ? 'weekXP' : 'totalXP';
+    const meId = Sync.myDocId(p) || 'moi';
+    const rows = (res ? res.rows : []).filter(r => r.id !== meId);
+    if (p.board.pseudo) rows.push({ id: meId, pseudo: p.board.pseudo, avatar: p.avatar, ...B.scoreOf(p, week) });
+    const { list: ranked, me } = B.rankRows(rows, tab, meId);
+    const shown = ranked.filter((r, i) => i < B.TOP);
+    shown.forEach(r => list.appendChild(boardRow(r, String(r.rank), key)));
+    const mineRow = ranked.find(r => r.me);
+    if (mineRow && !shown.includes(mineRow)) list.appendChild(boardRow(mineRow, `${B.TOP}+`, key));
+    let note = '';
+    if (!res) note = 'Classement indisponible pour l\'instant.';
+    else if (res.fromCache) note = 'Hors ligne : dernier classement connu.';
+    else if (!res.rows.length && tab === 'week') note = 'Personne n\'a encore joué cette semaine. Sois le premier !';
+    $('board-note').textContent = note;
+    if (mineRow) {
+        if (me.rank === 1 && ranked.filter(r => r[key] === mineRow[key]).length === 1 && ranked.length > 1) $('board-gap').textContent = '🏆 Tu es en tête !';
+        else if (me.gap) {
+            const ahead = ranked.filter(r => r[key] > mineRow[key]).pop();
+            $('board-gap').textContent = `Il te manque ${me.gap} point${me.gap > 1 ? 's' : ''} pour rejoindre ${ahead.pseudo}.`;
+        }
+    }
+}
+function boardRow(r, rankText, key) {
+    const row = el('div', `board-row${r.me ? ' me' : ''}`);
+    row.append(el('span', 'rk', rankText), el('span', null, r.avatar || '🙂'), el('span', 'nm', r.pseudo), el('b', null, `${r[key]} XP`));
+    return row;
+}
+$('board-card').addEventListener('click', () => { show('board'); renderBoard('week'); });
+$('board-back-btn').addEventListener('click', () => show('home'));
+$('board-tab-week').addEventListener('click', () => renderBoard('week'));
+$('board-tab-total').addEventListener('click', () => renderBoard('total'));
 
 // Fin de mission : où en est son équipe
 function renderEndChamp(res) {
@@ -572,6 +662,7 @@ function endGame() {
     S.saveProfiles();
     S.clearSession(p.id);
     Sync.backup(S.getProfiles(), true);
+    Sync.pushScore(p, S.weekId(), true);
 
     show('end');
     $('final-score').textContent = gained;

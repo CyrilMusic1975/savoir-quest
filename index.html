@@ -39,6 +39,7 @@
                         </div>
                     </div>
                     <button id="champ-card" class="champ-card" type="button" aria-label="Voir le classement du championnat"></button>
+                    <button id="board-card" class="board-card" type="button">👥 Classement des joueurs <span>›</span></button>
                     <div id="season-card" class="season-card"></div>
                 </div>
 
@@ -65,6 +66,11 @@
                     <label class="setting"><input type="checkbox" id="setting-timer"> Afficher le chrono</label>
                     <label class="setting"><input type="checkbox" id="setting-sound"> Sons</label>
                     <label class="setting"><input type="checkbox" id="setting-kiko"> Kiko, la mascotte</label>
+                    <div class="parent-link">
+                        <div class="setting-title">👥 Pseudo du classement</div>
+                        <p id="board-pseudo-status">Pas encore choisi.</p>
+                        <button id="board-pseudo-btn" class="btn btn-secondary">Changer mon pseudo</button>
+                    </div>
                     <div class="parent-link">
                         <div class="setting-title">🔔 Rappel quotidien (17 h 30)</div>
                         <p id="reminder-status">Non activé.</p>
@@ -112,6 +118,19 @@
             <div id="champ-table" class="champ-table"></div>
             <div id="champ-history" class="collection-summary"></div>
             <button id="champ-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
+        </div>
+
+        <!-- Classement des joueurs -->
+        <div id="board-screen" class="screen hidden">
+            <h1>👥 Classement des joueurs</h1>
+            <div class="board-tabs" role="group" aria-label="Type de classement">
+                <button id="board-tab-week" class="board-tab" type="button" aria-pressed="true">Semaine</button>
+                <button id="board-tab-total" class="board-tab" type="button" aria-pressed="false">Total</button>
+            </div>
+            <p id="board-note" class="muted" role="status"></p>
+            <div id="board-list" class="board-list"></div>
+            <p id="board-gap" class="board-gap"></p>
+            <button id="board-back-btn" class="btn btn-secondary mt-1">← RETOUR</button>
         </div>
 
         <!-- Zone de Jeu -->
@@ -185,6 +204,21 @@
             <div class="modal-actions">
                 <button id="cancel-profile-btn" class="btn btn-secondary">Annuler</button>
                 <button id="confirm-profile-btn" class="btn btn-primary">C'est parti !</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pseudo du classement -->
+    <div id="pseudo-modal" class="modal hidden">
+        <div class="modal-content animate-pop">
+            <h2>Ton pseudo</h2>
+            <p>Comment veux-tu t'appeler dans le classement ? Les autres joueurs verront ce pseudo, pas ton vrai nom.</p>
+            <input type="text" id="pseudo-input" autocomplete="off" enterkeyhint="done" maxlength="16" aria-label="Pseudo">
+            <div id="pseudo-chips" class="pseudo-chips"></div>
+            <p id="pseudo-error" class="pseudo-error" role="alert"></p>
+            <div class="modal-actions">
+                <button id="pseudo-cancel-btn" class="btn btn-secondary hidden">Annuler</button>
+                <button id="pseudo-ok-btn" class="btn btn-primary">OK</button>
             </div>
         </div>
     </div>
