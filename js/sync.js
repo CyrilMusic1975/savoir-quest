@@ -1,5 +1,7 @@
 // Suivi parent : envoie les résultats vers Firestore par l'API REST (sans SDK ; hors ligne géré par une file locale).
 // Connexion anonyme automatique, aucun code à saisir. Le jeu ne dépend jamais de ce module : toute erreur est ignorée.
+import { docId, scoreOf, boardQuery, fromFirestoreRows } from './classement.js';
+
 const CFG = { apiKey: 'AIzaSyCUJz0lIE14w2Mdf4HfFGgsbWfSGmcXo2M', projectId: 'savoir-quest-suivi' };
 const KEY = 'sq_sync';
 const MAX_QUEUE = 3000;
@@ -130,6 +132,68 @@ export async function putDoc(path, fields) {
         body: JSON.stringify({ fields })
     });
     return res.ok;
+}
+
+// ---------- Classement commun ----------
+// Seuls le pseudo, l'avatar et les points sont publiés (jamais le nom du profil). Retiré par le parent : refus 403, on n'insiste pas.
+const BOARD_KEY = 'sq_board';
+const SCORE_MIN_INTERVAL = 30 * 1000;
+const DENIED_PAUSE = 60 * 60 * 1000;
+const lastScore = {};
+
+export const myDocId = profile => (state.uid && profile ? docId(state.uid, profile.id) : null);
+
+export async function pushScore(profile, week, force = false) {
+    if (DEV || !profile || !profile.board || !profile.board.pseudo) return false;
+    try {
+        if (!navigator.onLine) return false;
+        const idToken = await token();
+        const id = docId(state.uid, profile.id);
+        const last = lastScore[id] || 0;
+        if (Date.now() < (state.denied && state.denied[id] || 0)) return false;
+        if (!force && Date.now() - last < SCORE_MIN_INTERVAL) return false;
+        lastScore[id] = Date.now();
+        const sc = scoreOf(profile, week);
+        const res = await fetch(`${DOCS}/scores/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+            body: JSON.stringify({ fields: {
+                pseudo: str(profile.board.pseudo), avatar: str(String(profile.avatar || '').slice(0, 8)), weekId: str(sc.weekId),
+                weekXP: { integerValue: String(Math.round(sc.weekXP)) }, totalXP: { integerValue: String(Math.round(sc.totalXP)) },
+                ts: { integerValue: String(Date.now()) }
+            } })
+        });
+        if (res.ok) return true;
+        if (res.status === 401) { state.idToken = null; save(); }
+        if (res.status === 403) { state.denied = { ...state.denied, [id]: Date.now() + DENIED_PAUSE }; save(); }
+    } catch (e) { /* hors ligne : on réessaiera à la prochaine mission */ }
+    return false;
+}
+
+function readBoardCache(tab) {
+    try { return JSON.parse(localStorage.getItem(BOARD_KEY))?.[tab] || null; } catch (e) { return null; }
+}
+function writeBoardCache(tab, entry) {
+    try { localStorage.setItem(BOARD_KEY, JSON.stringify({ ...JSON.parse(localStorage.getItem(BOARD_KEY) || '{}'), [tab]: entry })); } catch (e) { /* ignoré */ }
+}
+
+// Retourne { rows, fromCache } ou null si rien n'est disponible
+export async function fetchBoard(tab, week) {
+    const cached = readBoardCache(tab);
+    const fallback = () => (cached && cached.week === week ? { rows: cached.rows, fromCache: true } : null);
+    if (DEV || !navigator.onLine) return fallback();
+    try {
+        const idToken = await token();
+        const res = await fetch(`${DOCS}:runQuery`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+            body: JSON.stringify(boardQuery(tab, week))
+        });
+        if (!res.ok) { if (res.status === 401) { state.idToken = null; save(); } return fallback(); }
+        const rows = fromFirestoreRows(await res.json());
+        writeBoardCache(tab, { week, rows });
+        return { rows, fromCache: false };
+    } catch (e) { return fallback(); }
 }
 
 export async function flush() {
