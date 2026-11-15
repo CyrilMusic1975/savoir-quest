@@ -2,6 +2,14 @@
 
 Le numéro (`sq-vN`) est celui du service worker et de l'écran d'accueil.
 
+## v26 — Classement des joueurs
+- Nouvel écran « Classement des joueurs » (carte sur l'accueil) : deux onglets, **Semaine** (XP de la semaine, remis à zéro le lundi) et **Total**. Le joueur est mis en évidence avec son rang et les points qui lui manquent pour rejoindre celui qui le précède.
+- Tout joueur de l'application apparaît automatiquement. Un **pseudo** est demandé une seule fois (suggestions proposées, filtre de mots) ; il se change dans les réglages. Le vrai nom n'est jamais publié : seulement pseudo, avatar et points.
+- Le score est publié dans Firestore (`scores`) après chaque mission ; le jeu fonctionne sans réseau (dernier classement en cache, clé `sq_board`). Rien n'est envoyé sur `localhost`.
+- Le parent peut retirer un joueur depuis le tableau de bord (liste `bans` : il ne peut plus republier) et le réautoriser.
+- Nouveau module pur `js/classement.js` ; nouveau champ de profil `board` (`ensureProfile`) ; nouveau contrôle `classement` (pseudo, rang recalculé, requête, lecture).
+- Règles Firestore (`scores`, `bans`) et index composite dans le dépôt `SavoirQuest-suivi`, à déployer **avant** l'appli.
+
 ## v25 — Kiko explique les objectifs, un par jour
 - Sur l'accueil, Kiko présente un objectif à la fois, une fois par jour : le match, le championnat, les XP, la ligue de la semaine, les cartes de joueur, les records, puis la série de jours. L'élève valide avec « J'ai compris » ; une explication vue ne revient pas.
 - Les explications vues sont retenues dans le profil (`kikoTips`, `kikoTipDay`, ajoutés par `ensureProfile`). Elles disparaissent si on désactive Kiko dans les réglages.

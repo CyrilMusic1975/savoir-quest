@@ -33,6 +33,7 @@ js/
   engine.js           Composition des séances, répétition espacée, badges, suivi des cas précis
   progress.js         Match, saison hebdomadaire, records, cartes de joueur
   championnat.js      Championnat à 10 équipes : calendrier, simulation, classement
+  classement.js       Classement commun des joueurs : pseudo, rang, requête Firestore (calculs purs)
   kiko.js             Mascotte Kiko : phrases, seconde chance, explications des objectifs
   render.js           Affichage des questions (un rendu par type d'exercice)
   state.js            Profils et réglages dans le navigateur (localStorage)

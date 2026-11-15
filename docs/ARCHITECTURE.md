@@ -26,6 +26,7 @@ L'application fonctionne **entièrement sans le cloud** : la progression vit dan
 | `engine.js` | Construit les séances, enregistre les réponses (maîtrise, répétition espacée, badges, cas précis) | `content`, `state` |
 | `progress.js` | Saison, match, records, cartes de joueur (calculs purs, sans interface) | `state` |
 | `championnat.js` | Championnat à 10 équipes : calendrier, simulation, classement (calculs purs) | `progress` |
+| `classement.js` | Classement commun des joueurs : pseudo et filtre, score publié, rang, requête et lecture Firestore — pur | — |
 | `kiko.js` | Mascotte Kiko : phrases, règle de seconde chance (`canRetry`), explications des objectifs (`TIPS`, `nextTip`) — pur | — |
 | `render.js` | Affiche chaque type de question et appelle `submit(correct, réponse)` | `content/helpers` |
 | `state.js` | Lecture/écriture des profils, réglages et séance en cours dans `localStorage` ; dates et semaines | — |
@@ -64,9 +65,10 @@ Stocké sous la clé `mathQuest_profiles` (liste de profils). Les champs absents
 | `champ`, `champHistory[]` | Saison de championnat en cours (scores de l'élève) et saisons terminées (rang, points) |
 | `season`, `seasons[]`, `pendingSeasonReview` | Saison en cours (semaine ISO, XP), historique, bilan à afficher |
 | `daily{streak,last}` | Série de jours consécutifs |
+| `board{pseudo}` | Pseudo affiché dans le classement commun (`null` tant qu'il n'est pas choisi) |
 | `kikoTips[]`, `kikoTipDay` | Explications d'objectifs déjà vues et jour de la dernière (une par jour) |
 
-Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono, sons, Kiko), `sq_session_<profil>` (séance à reprendre), `sq_sync` (jeton et file d'envoi), `sq_push_sub` (abonnement aux notifications), `sq_reminder_dismissed`.
+Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono, sons, Kiko), `sq_session_<profil>` (séance à reprendre), `sq_sync` (jeton et file d'envoi), `sq_board` (dernier classement reçu, pour le hors ligne), `sq_push_sub` (abonnement aux notifications), `sq_reminder_dismissed`.
 
 ## Déroulement d'une séance (`buildSession`)
 
@@ -75,6 +77,13 @@ Autres clés `localStorage` : `mathQuest_activeProfileId`, `sq_settings` (chrono
 3. **Cas précis** : avant chaque séance, `weakFacets` liste les facettes ratées (au moins 2 essais, moins de 60 % de réussite). Les générateurs concernés les proposent environ une fois sur deux.
 4. **Questions de banque** : niveau limité au niveau débloqué ; les nouvelles questions sont préférées (70 %).
 5. **Entraînement par matière** (`subject`) et **carnet d'erreurs** (`errors`) suivent le même principe, restreints.
+
+## Classement commun (`classement.js`, `sync.js`, `main.js`)
+
+- Chaque profil publie un document `scores/<uid>_<idProfil>` : `pseudo`, `avatar`, `weekId`, `weekXP`, `totalXP`, `ts`. **Jamais** le nom du profil, les réponses ni les matières. Tous les joueurs connectés (anonymes) peuvent lire ; chacun n'écrit que ses documents.
+- `pushScore` est appelé en fin de mission, à l'ouverture de l'accueil, après choix du pseudo et à l'ouverture de l'écran (anti-rebond de 30 s). Un refus 403 (joueur retiré par le parent, liste `bans`) met l'envoi en pause une heure.
+- `fetchBoard` lit le top 50 par `runQuery` (onglet Semaine : filtre `weekId` + tri `weekXP`, index composite). La ligne du joueur est toujours recalculée avec ses points locaux.
+- Règles, index et modération : dépôt `SavoirQuest-suivi`.
 
 ## Kiko et la seconde chance (`kiko.js`, `main.js`, `render.js`)
 
