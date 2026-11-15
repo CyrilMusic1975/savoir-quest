@@ -6,10 +6,11 @@ import { run as engine } from './engine.test.mjs';
 import { run as progress } from './progress.test.mjs';
 import { run as kiko } from './kiko.test.mjs';
 import { run as championnat } from './championnat.test.mjs';
+import { run as classement } from './classement.test.mjs';
 
 let failures = 0;
 const MAX_SHOWN = Number(process.env.SHOW) || 10;
-for (const [name, fn] of [['contenu', content], ['générateurs', generators], ['générateurs 6e', generators6e], ['conjugaison', conjugaison], ['moteur', engine], ['compétition', progress], ['Kiko', kiko], ['championnat', championnat]]) {
+for (const [name, fn] of [['contenu', content], ['générateurs', generators], ['générateurs 6e', generators6e], ['conjugaison', conjugaison], ['moteur', engine], ['compétition', progress], ['Kiko', kiko], ['championnat', championnat], ['classement', classement]]) {
     const errs = [];
     const info = fn(msg => errs.push(msg));
     if (errs.length) {

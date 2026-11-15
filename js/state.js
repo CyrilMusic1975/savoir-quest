@@ -43,6 +43,7 @@ export function ensureProfile(p) {
     p.champHistory = p.champHistory || [];
     p.kikoTips = p.kikoTips || [];
     p.kikoTipDay = p.kikoTipDay || null;
+    p.board = p.board || { pseudo: null };
     p.schemaVersion = 2;
     return p;
 }
